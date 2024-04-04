@@ -26,15 +26,9 @@ gestorbiblioteca_1(char *host)
 {	
 	
  	CLIENT *clnt;
-	int  *result_1;
-	char  conexion_1_arg;
 	bool_t  *result_2;
 	int  desconexion_1_arg;
-	int  *result_3;
-	TConsulta  cargardatos_1_arg;
-	bool_t  *result_4;
 	int  guardardatos_1_arg;
-	int  *result_5;
 	TNuevo  nuevolibro_1_arg;
 	int  *result_6;
 	TComRet  comprar_1_arg;
@@ -54,6 +48,7 @@ gestorbiblioteca_1(char *host)
 	TPosicion  devolver_1_arg;
 
 #ifndef	DEBUG
+
 	clnt = clnt_create (host, GESTORBIBLIOTECA, GESTORBIBLIOTECA_VER, "udp");
 	if (clnt == NULL) {
 		clnt_pcreateerror (host);
@@ -62,118 +57,8 @@ gestorbiblioteca_1(char *host)
 #endif	/* DEBUG */
 
 
-		int opc1 = MenuPrincipal();
-		int opc2;
-	switch(opc1){
-	
-		case 1:
-			opc2 = MenuAdministracion();
-				switch(opc2){
-					case 1:
-						Cls;
-						printf("\t***CARGAR DATOS BIBLIOTECA***\n");
-						char datos[100];
-						printf("Introduce el nombre de los datos: ");
-						scanf("%s", datos);
-						
-						TConsulta cargardatos_1_arg;
-						strcpy(cargardatos_1_arg.Datos, datos);
-						
-						result_3 =cargardatos_1(&cargardatos_1_arg,clnt);
-							if (result_3 == (int *) NULL ) {
-								clnt_perror (clnt, "call failed");
-							}else if(*result_3 == -1){
-							printf("ERROR. Numero de libros cargados: %d\n", *result_3);
-							}else{ 
-								printf("DATOS INTRODUCIDOS CORRECTAMENTE");
-								}
-						break;
-					case 2:
-					 	Cls;
-						printf("\t***GUARDAR DATOS BIBLIOTECA***\n");
-						break;
-					case 3:
-						Cls;
-						TNuevo nuevolibro_1_arg;
-							char isbn[40];
-							char autor[40];
-							char titulo[40];
-							int anio;
-							char pais[40];
-							char idioma[40];
-							int numLibrosInicial;
-								Cls;
-								printf("\t***NUEVO LIBRO***\n");
-								printf("\t**********************************************\n");
-								printf("\tIntroduce el Isbn: ");
-								scanf("%s",nuevolibro_1_arg.Libro.Isbn);		
-								printf("\tIntroduce el autor:");
-								scanf("%s",nuevolibro_1_arg.Libro.Autor);
-								printf("\tIntroduce el titulo:");
-								scanf("%s",nuevolibro_1_arg.Libro.Titulo);
-								printf("\tIntroduce el anio:");
-								scanf("%d",&nuevolibro_1_arg.Libro.Anio);
-								printf("\tIntroduce el pais:");
-								scanf("%s",nuevolibro_1_arg.Libro.Pais);
-								printf("\tIntroduce el idioma:");
-								scanf("%s",nuevolibro_1_arg.Libro.Idioma);
-								printf("\tIntroduce el numero de Libros inicial:");
-								scanf("%d",&nuevolibro_1_arg.Libro.NoLibros);
-								
-								
-								result_5 = nuevolibro_1(&nuevolibro_1_arg, clnt);
-								
-									if (result_5 == (int *) NULL) {
-										clnt_perror (clnt, "call failed");
-									}else if(*result_1 == 1){
-									
-										printf("El libro se ha registrado correctamente");
-									}else printf("El libro no se ha creado");
-									
-						break;	
-					case 4:
-						Cls;
-						printf("\t***COMPRAR LIBROS***\n");
-						break;
-					case 5:
-						Cls;
-						printf("\t***RETIRAR LIBROS***\n");
-						break;
-					case 6:
-						Cls;
-						printf("\t***ORDENAR LIBROS***\n");
-						break;	
-					case 7:
-						Cls;
-						printf("\t***BUSCAR LIBROS***\n");
-						break;
-					case 8:
-						Cls;
-						printf("\t***LISTAR LIBROS***\n");
-						break;
-					case 0:
-						Cls;
-						printf("\t***SALIR***\n");
-						break;	
-				}
 		
-			break;
-		case 2:
-			Cls;
-			printf("\t***CONSULTA DE LIBROS***\n");
-			break;
-		case 3:
-			Cls;
-			printf("\t***PRESTAMO DE LIBROS***\n");
-			break;
-		case 4:
-			Cls;
-			printf("\t***DEVOLUCION DE LIBROS***\n");
-			break;
-	
-	
-	}
-
+/*
 	result_1 = conexion_1(&conexion_1_arg, clnt);
 	if (result_1 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
@@ -219,9 +104,8 @@ gestorbiblioteca_1(char *host)
 	if (result_13 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
-#ifndef	DEBUG
-	clnt_destroy (clnt);
-#endif	 /* DEBUG */
+
+*/
 }
 
 
@@ -331,13 +215,177 @@ void MostrarLibro(TLibro *L, int Pos, bool_t Cabecera)
 int main (int argc, char *argv[])
 {
 	char *host;
-
+	TConsulta  cargardatos_1_arg;
+	char  conexion_1_arg;
+	bool_t  *result_bool;
+	int  *result_int;
+	char user[50];
+	int pass;
+	int opc1 = 1;
+	int opc2 = 0;
+	int idAdmin = 0;
+	
 	if (argc < 2) {
 		printf ("usage: %s server_host\n", argv[0]);
 		exit (1);
 	}
 	host = argv[1];
-	gestorbiblioteca_1 (host);
+	//gestorbiblioteca_1 (host);
+	 CLIENT *clnt;
+
+	clnt = clnt_create (host, GESTORBIBLIOTECA, GESTORBIBLIOTECA_VER, "tcp");
+	
+	if (clnt == NULL) {
+		clnt_pcreateerror (host);
+		exit (1);
+	}
+
+	
+
+	do{
+
+	opc1 = MenuPrincipal();
+
+	switch(opc1){
+	
+		case 1:	
+			printf("\t***REGISTRAR ADMINISTRADOR***\n");
+			printf("Introduce el nombre del admin(admin): ");
+			scanf("%s",user);
+			printf("Introduce el password del admin(1234): ");
+			scanf("%d",&pass);
+			conexion_1_arg = pass;
+			result_int = conexion_1(&conexion_1_arg, clnt);
+			
+			printf("El valor del resultado es %d.\n", *result_int);
+			if (result_int == (int *)NULL)
+			{
+				clnt_perror(clnt, "call failed");
+			}
+			else if (*result_int == -2)
+			{
+				printf("ERROR. Password incorrecta\n");
+			}
+			else if (*result_int == -1)
+			{
+				printf("ERROR. Administrador ya logeuado\n");
+			}
+			else
+			{
+			printf("CONTRASEÑA CORRECTA");
+			 idAdmin = *result_int;
+			 
+		
+			opc2 = MenuAdministracion();
+				switch(opc2){
+					case 1:
+						Cls;
+						printf("\t***CARGAR DATOS BIBLIOTECA***\n");
+						Cadena datos;
+						printf("Introduce el nombre de los datos: ");
+						scanf("%s", datos);
+						
+						cargardatos_1_arg.Ida = idAdmin;
+						strcpy(cargardatos_1_arg.Datos, datos);
+						
+						result_int=cargardatos_1(&cargardatos_1_arg,clnt);
+							if (result_int == (int *) NULL ) {
+								clnt_perror (clnt, "call failed");
+							}else if(*result_int == -1){
+							printf("ERROR. Numero de libros cargados: %d\n", *result_int);
+							}else if(*result_int == -1)
+							printf("ERROR. Numero de libros cargados: %d\n", *result_int);
+							{ 
+								printf("DATOS INTRODUCIDOS CORRECTAMENTE");
+								}
+						break;
+					case 2:
+					 	Cls;
+						printf("\t***GUARDAR DATOS BIBLIOTECA***\n");
+						break;
+					case 3:
+						Cls;
+						TNuevo nuevolibro_1_arg;
+							
+								Cls;
+								printf("\t***NUEVO LIBRO***\n");
+								printf("\t**********************************************\n");
+								printf("\tIntroduce el Isbn: ");
+								scanf("%s",nuevolibro_1_arg.Libro.Isbn);		
+								printf("\tIntroduce el autor:");
+								scanf("%s",nuevolibro_1_arg.Libro.Autor);
+								printf("\tIntroduce el titulo:");
+								scanf("%s",nuevolibro_1_arg.Libro.Titulo);
+								printf("\tIntroduce el anio:");
+								scanf("%d",&nuevolibro_1_arg.Libro.Anio);
+								printf("\tIntroduce el pais:");
+								scanf("%s",nuevolibro_1_arg.Libro.Pais);
+								printf("\tIntroduce el idioma:");
+								scanf("%s",nuevolibro_1_arg.Libro.Idioma);
+								printf("\tIntroduce el numero de Libros inicial:");
+								scanf("%d",&nuevolibro_1_arg.Libro.NoLibros);
+								
+								
+								result_int = nuevolibro_1(&nuevolibro_1_arg, clnt);
+								
+									if (result_int == (int *) NULL) {
+										clnt_perror (clnt, "call failed");
+									}else if(*result_int == 1){
+										printf("El libro se ha registrado correctamente");
+									}else printf("El libro no se ha creado");
+									
+						break;	
+					case 4:
+						Cls;
+						printf("\t***COMPRAR LIBROS***\n");
+						break;
+					case 5:
+						Cls;
+						printf("\t***RETIRAR LIBROS***\n");
+						break;
+					case 6:
+						Cls;
+						printf("\t***ORDENAR LIBROS***\n");
+						break;	
+					case 7:
+						Cls;
+						printf("\t***BUSCAR LIBROS***\n");
+						break;
+					case 8:
+						Cls;
+						printf("\t***LISTAR LIBROS***\n");
+						break;
+					case 0:
+						Cls;
+						printf("\t***SALIR***\n");
+						break;	
+				
+						}
+			}
+		
+			break;
+		case 2:
+			Cls;
+			printf("\t***CONSULTA DE LIBROS***\n");
+			break;
+		case 3:
+			Cls;
+			printf("\t***PRESTAMO DE LIBROS***\n");
+			break;
+		case 4:
+			Cls;
+			printf("\t***DEVOLUCION DE LIBROS***\n");
+			break;
+
+	
+	}
+	}while(opc1 != 0);
+
+	
+	
+
+clnt_destroy (clnt);
+
 	exit (0);
 }
 

@@ -6,7 +6,6 @@
 
 #include "GestorBiblioteca.h"
 
-#define MAX_LIBROS 100
 
 TLibro *Biblioteca = NULL;
 
@@ -18,13 +17,20 @@ int campoOrd = 0;
 
 
 int *
-conexion_1_svc(char *argp, struct svc_req *rqstp)
+conexion_1_svc(int *argp, struct svc_req *rqstp)
 {
 	static int  result;
+	int pass = *argp;
+	
+	if(pass != 1234){
+		result = -2;
+	}else if(idAdmin != -1){
+		result = -1;
+	}else{
+		idAdmin = 1 + rand() % RAND_MAX;
+		result = idAdmin;
+	}
 
-	/*
-	 * insert server code here
-	 */
 
 	return &result;
 }
@@ -48,24 +54,25 @@ cargardatos_1_svc(TConsulta *argp, struct svc_req *rqstp)
 	static int  result;
 	FILE *archivo = fopen(argp->Datos, "rb");
 	
-	if(archivo == NULL){
-		perror("Error al abrir el archivo");
-	result = -1;
+	const int idAdminC = argp-> Ida;
 	
+	if(idAdmin != idAdminC){
+		result = -1;
 	}else{
+		if(archivo == NULL){
+			result = -1;
 		
-	TLibro libros[MAX_LIBROS];
-	int nLibros = 0;
-
-	while(nLibros <MAX_LIBROS && fread(&libros[nLibros], sizeof(TLibro), 1, archivo))
-		nLibros++;
-
-	fclose(archivo);
-
-	result = nLibros;
-	printf("Numero de libros cargados: %d.\n",result);
-
+		}
+		
+		numLibros = fread(Biblioteca, sizeof(TLibro), 1, archivo);
+		
+		perror("Numero de libros: " + numLibros);
+	
+	
+	
 	}
+	
+	
 
 	return &result;
 }
@@ -87,15 +94,15 @@ nuevolibro_1_svc(TNuevo *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	TLibro nuevoLibro = argp->Libro;
+	//TLibro nuevoLibro = argp->Libro;
 	
-	if(numLibros < MAX_LIBROS)
+	/*if(numLibros < MAX_LIBROS)
 	{
 		Biblioteca[numLibros] = nuevoLibro;
 		numLibros++;
 	result = 1;
 	}else result = 0;
-	
+	*/
 	return &result;
 }
 
