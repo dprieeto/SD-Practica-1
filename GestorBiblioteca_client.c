@@ -396,6 +396,13 @@ int main (int argc, char *argv[])
 		case 3:
 			Cls;
 			printf("\t***PRESTAMO DE LIBROS***\n");
+			
+			
+			
+			break;
+		case 4:
+			Cls;
+			printf("\t***DEVOLUCION DE LIBROS***\n");
 			char isbn[40];
 			char respuesta;
 			int posicion;
@@ -415,12 +422,6 @@ int main (int argc, char *argv[])
 				
 				printf("\n*** Se ha devuelto correctamente el libro y se pondra en la estanteria. ***\n");
 			}
-			
-			
-			break;
-		case 4:
-			Cls;
-			printf("\t***DEVOLUCION DE LIBROS***\n");
 			break;
 
 	
