@@ -367,7 +367,31 @@ int main (int argc, char *argv[])
 			break;
 		case 2:
 			Cls;
+			char campo[50];
+			char codigo;
 			printf("\t***CONSULTA DE LIBROS***\n");
+			printf("\nIntroduce el texto a buscar: ");
+			scanf("%s", campo);
+			do {
+				printf("\n\tTexto a buscar: %s", campo);
+				printf("\n\tCodigo de consulta:\n");
+				printf("\tI.- Por Isbn\n");
+				printf("\tT.- Por Titulo\n");
+				printf("\tA.- Por Autor\n");
+				printf("\tP.- Por Pais\n");
+				printf("\tD.- Por Idioma\n");
+				printf("\t*.- Por todos los campos\n");
+				printf("\nIntroduce codigo: ");
+				scanf(" %c", &codigo); //" %c" para que ignore cualquier espacio en blanco
+				
+			} while(codigo!='I' && codigo!='T' && codigo!='A' && codigo!='P' && codigo!='D' && codigo!='*');
+			
+			// acceder al registro de libros o cargarlos para buscarlo?
+			printf("\nHa elegido la opcion : %c", codigo);
+				
+			//mostrar libros
+			
+			Pause;
 			break;
 		case 3:
 			Cls;
