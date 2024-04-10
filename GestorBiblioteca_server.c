@@ -6,6 +6,7 @@
 
 #include "GestorBiblioteca.h"
 
+#define MAX_LIBROS 10000
 
 TLibro *Biblioteca = NULL;
 
@@ -15,13 +16,20 @@ int idAdmin = -1;
 Cadena nameFich = "";
 int campoOrd = 0;
 
+  // Convertir pass a una cadena de caracteres
+  // char pass_str[10];
+  // sprintf(pass_str, "%d", pass);
+
+  // Imprimir el valor de pass utilizando perror
+  // perror("El valor de pass es");
+  // perror(pass_str);
+
 
 int *
 conexion_1_svc(int *argp, struct svc_req *rqstp)
 {
 	static int  result;
 	int pass = *argp;
-	
 	if(pass != 1234){
 		result = -2;
 	}else if(idAdmin != -1){
@@ -29,6 +37,7 @@ conexion_1_svc(int *argp, struct svc_req *rqstp)
 	}else{
 		idAdmin = 1 + rand() % RAND_MAX;
 		result = idAdmin;
+		Biblioteca = (TLibro *) malloc(sizeof(TLibro)*numLibros);
 	}
 
 
@@ -56,6 +65,8 @@ cargardatos_1_svc(TConsulta *argp, struct svc_req *rqstp)
 	
 	const int idAdminC = argp-> Ida;
 	
+	TLibro libro = {};
+	
 	if(idAdmin != idAdminC){
 		result = -1;
 	}else{
@@ -64,16 +75,22 @@ cargardatos_1_svc(TConsulta *argp, struct svc_req *rqstp)
 		
 		}
 		
-		numLibros = fread(Biblioteca, sizeof(TLibro), 1, archivo);
+		fread(&numLibros, sizeof(numLibros), 1, archivo);
 		
-		perror("Numero de libros: " + numLibros);
-	
-	
+		
+		
+		if(Biblioteca == NULL){
+			perror("ERROR: No se ha reservado memoria para la biblioteca");
+		}else{
+		
+			fread(Biblioteca, sizeof(libro) * numLibros, numLibros, archivo);
+		}
+		fclose(archivo);
+		
+		result = numLibros;
 	
 	}
 	
-	
-
 	return &result;
 }
 
@@ -94,15 +111,22 @@ nuevolibro_1_svc(TNuevo *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	//TLibro nuevoLibro = argp->Libro;
+	TLibro nuevoLibro = argp->Libro;
 	
-	/*if(numLibros < MAX_LIBROS)
-	{
-		Biblioteca[numLibros] = nuevoLibro;
-		numLibros++;
-	result = 1;
-	}else result = 0;
-	*/
+	if(Biblioteca == NULL){
+		result = -1;
+	}else{
+			
+		if(numLibros < MAX_LIBROS)
+		{
+			Biblioteca[numLibros] = nuevoLibro;
+			numLibros++;
+			result = 1;
+		}else result = 0;	
+	}
+	
+
+	
 	return &result;
 }
 

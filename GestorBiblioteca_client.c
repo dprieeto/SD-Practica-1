@@ -115,6 +115,7 @@ int MenuPrincipal()
 	 int Salida;
 	 do
 	 {
+	 	//Pause;
 		Cls;
 		printf(" GESTOR BIBLIOTECARIO 1.0 (M. PRINCIPAL)\n");
 		printf("*****************************************\n");
@@ -145,6 +146,7 @@ int MenuAdministracion()
 	 int Salida;
 	 do
 	 {
+	 	//Pause;
 		Cls;
 		printf(" GESTOR BIBLIOTECARIO 1.0 (M. ADMINISTRACION)\n");
 		printf("**********************************************\n");
@@ -216,11 +218,11 @@ int main (int argc, char *argv[])
 {
 	char *host;
 	TConsulta  cargardatos_1_arg;
-	char  conexion_1_arg;
+	int  conexion_1_arg;
 	bool_t  *result_bool;
 	int  *result_int;
 	char user[50];
-	int pass;
+	int pass = 0;
 	int opc1 = 1;
 	int opc2 = 0;
 	int idAdmin = 0;
@@ -230,7 +232,6 @@ int main (int argc, char *argv[])
 		exit (1);
 	}
 	host = argv[1];
-	//gestorbiblioteca_1 (host);
 	 CLIENT *clnt;
 
 	clnt = clnt_create (host, GESTORBIBLIOTECA, GESTORBIBLIOTECA_VER, "tcp");
@@ -285,19 +286,18 @@ int main (int argc, char *argv[])
 						printf("Introduce el nombre de los datos: ");
 						scanf("%s", datos);
 						
-						cargardatos_1_arg.Ida = idAdmin;
 						strcpy(cargardatos_1_arg.Datos, datos);
-						
-						result_int=cargardatos_1(&cargardatos_1_arg,clnt);
+						cargardatos_1_arg.Ida = idAdmin;
+							result_int=cargardatos_1(&cargardatos_1_arg,clnt);
+							
 							if (result_int == (int *) NULL ) {
 								clnt_perror (clnt, "call failed");
 							}else if(*result_int == -1){
 							printf("ERROR. Numero de libros cargados: %d\n", *result_int);
-							}else if(*result_int == -1)
-							printf("ERROR. Numero de libros cargados: %d\n", *result_int);
+							}else
 							{ 
-								printf("DATOS INTRODUCIDOS CORRECTAMENTE");
-								}
+							printf("DATOS INTRODUCIDOS CORRECTAMENTE, Numero de libros cargados: %d\n", *result_int);
+							}
 						break;
 					case 2:
 					 	Cls;
@@ -359,8 +359,9 @@ int main (int argc, char *argv[])
 						Cls;
 						printf("\t***SALIR***\n");
 						break;	
-				
+					
 						}
+						
 			}
 		
 			break;
@@ -379,6 +380,7 @@ int main (int argc, char *argv[])
 
 	
 	}
+	Pause;
 	}while(opc1 != 0);
 
 	
