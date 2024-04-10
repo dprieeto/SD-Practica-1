@@ -387,15 +387,36 @@ int main (int argc, char *argv[])
 			} while(codigo!='I' && codigo!='T' && codigo!='A' && codigo!='P' && codigo!='D' && codigo!='*');
 			
 			// acceder al registro de libros o cargarlos para buscarlo?
-			printf("\nHa elegido la opcion : %c", codigo);
+			printf("\nHa elegido la opcion : %c\n", codigo);
 				
 			//mostrar libros
 			
-			Pause;
+			//Pause;
 			break;
 		case 3:
 			Cls;
 			printf("\t***PRESTAMO DE LIBROS***\n");
+			char isbn[40];
+			char respuesta;
+			int posicion;
+			printf("\nIntroduce el Isbn a buscar: ");
+			scanf("%s", isbn);
+			
+			//mostrar libros
+			do {
+				printf("\nQuieres devolver algun libro de la biblioteca (s/n)? ");
+				scanf(" %c", &respuesta);
+			} while(respuesta!='s' && respuesta!='n');
+			if(respuesta=='s') {
+				printf("\nIntroduce la posicion del libro a devolver: ");
+				scanf("%d", &posicion);
+				
+				// devlver libro
+				
+				printf("\n*** Se ha devuelto correctamente el libro y se pondra en la estanteria. ***\n");
+			}
+			
+			
 			break;
 		case 4:
 			Cls;
