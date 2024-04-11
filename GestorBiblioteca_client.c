@@ -21,6 +21,8 @@ void menu();
 int MenuPrincipal();
 int MenuAdministracion();
 void MostrarAviso(const char* texto);
+void FiltrarLibros(TLibro *L, char tipo, char *cadena, int nLibros);
+
 
 void
 gestorbiblioteca_1(char *host)
@@ -38,7 +40,6 @@ gestorbiblioteca_1(char *host)
 	bool_t  *result_8;
 	TOrdenacion  ordenar_1_arg;
 	int  *result_10;
-	TConsulta  buscar_1_arg;
 	int  *result_12;
 	TPosicion  prestar_1_arg;
 	int  *result_13;
@@ -56,10 +57,7 @@ gestorbiblioteca_1(char *host)
 
 		
 /*
-	result_1 = conexion_1(&conexion_1_arg, clnt);
-	if (result_1 == (int *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
+
 	result_2 = desconexion_1(&desconexion_1_arg, clnt);
 	if (result_2 == (bool_t *) NULL) {
 		clnt_perror (clnt, "call failed");
@@ -85,14 +83,7 @@ gestorbiblioteca_1(char *host)
 	if (result_9 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
-	result_10 = buscar_1(&buscar_1_arg, clnt);
-	if (result_10 == (int *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
-	result_11 = descargar_1(&descargar_1_arg, clnt);
-	if (result_11 == (TLibro *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
+
 	result_12 = prestar_1(&prestar_1_arg, clnt);
 	if (result_12 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
@@ -211,10 +202,69 @@ void MostrarLibro(TLibro *L, int Pos, bool_t Cabecera)
 	printf("     %s%s%-*d\n",A ,PI,12, L->Anio);
 }
 
+void FiltrarLibros(TLibro *L, char tipo, char *cadena, int nLibros){
+
+	TLibro *librosFiltrados;
+	int nLibrosFiltrados = 0;
+
+	for(int i = 0; i < nLibros; i++)
+	{
+		switch(tipo){
+
+			case 'I':
+				
+				if(strstr(L->Isbn, cadena) != NULL){
+					MostrarLibro(L, i, FALSE);
+				}
+				
+				break;
+			case 'T':
+				if(strstr(L->Titulo, cadena) != NULL){
+					MostrarLibro(L, i, FALSE);
+				}
+				break;
+			case 'A':
+				if(strstr(L->Autor, cadena) != NULL){
+					MostrarLibro(L, i, FALSE);
+				}
+				break;
+			case 'P':
+				if(strstr(L->Pais, cadena) != NULL){
+					MostrarLibro(L, i, FALSE);
+				}
+				break;
+			case 'D':
+				if(strstr(L->Idioma, cadena) != NULL){
+					MostrarLibro(L, i, FALSE);
+				}
+				break;
+			case '*':
+				
+				if(strstr(L->Isbn, cadena) != NULL){
+					MostrarLibro(L, i, FALSE);
+				}else if(strstr(L->Titulo, cadena) != NULL){
+					MostrarLibro(L, i, FALSE);
+				}else if(strstr(L->Autor, cadena) != NULL){
+					MostrarLibro(L, i, FALSE);
+				}else if(strstr(L->Pais, cadena) != NULL){
+					MostrarLibro(L, i, FALSE);
+				}else if(strstr(L->Idioma, cadena) != NULL){
+					MostrarLibro(L, i, FALSE);
+				}
+				break;
+
+		}
+	}
+
+
+}
+
+
 int main (int argc, char *argv[])
 {
 	char *host;
 	TConsulta  cargardatos_1_arg;
+	TConsulta  buscar_1_arg;
 	int  conexion_1_arg;
 	int  nlibros_1_arg;
 	TPosicion  descargar_1_arg;
@@ -223,6 +273,7 @@ int main (int argc, char *argv[])
 	bool_t  *result_bool;
 	int  *result_int;
 	char user[50];
+	char text[50];
 	int pass = 0;
 	int opc1 = 1;
 	int opc2 = 0;
@@ -358,6 +409,50 @@ int main (int argc, char *argv[])
 					case 7:
 						Cls;
 						printf("\t***BUSCAR LIBROS***\n");
+						
+						printf("Introduce el texto a Buscar: ");
+						scanf("%s",text);
+						printf("\n");
+						printf("Codigo de consulta\n");
+						printf("I.- Por Isbn\n");
+						printf("T.- Por Titulo\n");
+						printf("A.- Por Autor\n");
+						printf("P.- Por Pais\n");
+						printf("D.- Por Idioma\n");
+						printf("*.- Por todos los campos\n");
+						
+						char opcBuscar;
+						printf("Introduce Codigo: ");
+						scanf(" %c",&opcBuscar);	
+				    			result_int = nlibros_1(&nlibros_1_arg, clnt);
+								if(result_int == (int *) NULL){
+									clnt_perror(clnt, "call failed" );
+								}else{
+									int totalLibros = *result_int;
+									printf("Total libros: %d\n", *result_int);
+									if(totalLibros == 0){
+										printf("No hay libros cargados");
+									}else{
+									
+									printf("POS TITULO                                 \tISBN         			     DIS PRE RES\n");
+			    						printf(" AUTOR                                   PAIS (IDIOMA)    AÑO\n");
+			    						printf("*********************************************************************************************\n");
+									descargar_1_arg.Ida=idAdmin;
+									for(int i = 0; i < totalLibros; i++){
+										descargar_1_arg.Pos = i;
+										result_libro = descargar_1(&descargar_1_arg, clnt);
+										
+										if(result_libro == (TLibro *)NULL){
+										printf("ERROR. No se han obtenido los detalles del libro %d\n", i + 1);
+										}else{
+											FiltrarLibros(result_libro, opcBuscar, text, 1);
+										}
+									
+									    }
+										
+							}
+						}
+							
 						break;
 					case 8:
 						Cls;
@@ -373,7 +468,7 @@ int main (int argc, char *argv[])
 								printf("No hay libros cargados");
 							}else{
 							
-							printf("POS TITULO                                 \tISBN             DIS PRE RES\n");
+							printf("POS TITULO                                 \tISBN    		             DIS PRE RES\n");
             						printf(" AUTOR                                   PAIS (IDIOMA)    AÑO\n");
             						printf("*********************************************************************************************\n");
 							descargar_1_arg.Ida=idAdmin;
@@ -410,6 +505,24 @@ int main (int argc, char *argv[])
 		case 3:
 			Cls;
 			printf("\t***PRESTAMO DE LIBROS***\n");
+			
+			printf("Introduce el texto a Buscar: ");
+			scanf("%s",text);
+			printf("\n");
+			printf("Codigo de consulta\n");
+			printf("I.- Por Isbn");
+			printf("T.- Por Titulo");
+			printf("A.- Por Autor");
+			printf("P.- Por Pais");
+			printf("D.- Por Idioma");
+			printf("*.- Por todos los campos");
+			
+			char opcBuscar[1];
+			printf("Introduce Codigo: ");
+			scanf("%s",opcBuscar);
+			
+			
+			
 			break;
 		case 4:
 			Cls;
