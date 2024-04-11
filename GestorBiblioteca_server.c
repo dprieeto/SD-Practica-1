@@ -6,7 +6,7 @@
 
 #include "GestorBiblioteca.h"
 
-#define MAX_LIBROS 10000
+#define MAX_LIBROS 10000	
 
 TLibro *Biblioteca = NULL;
 
@@ -37,7 +37,6 @@ conexion_1_svc(int *argp, struct svc_req *rqstp)
 	}else{
 		idAdmin = 1 + rand() % RAND_MAX;
 		result = idAdmin;
-		Biblioteca = (TLibro *) malloc(sizeof(TLibro)*numLibros);
 	}
 
 
@@ -61,33 +60,32 @@ cargardatos_1_svc(TConsulta *argp, struct svc_req *rqstp)
 {
 	printf("Ejecucion cargar datos servidor");
 	static int  result;
-	FILE *archivo = fopen(argp->Datos, "rb");
 	
-	const int idAdminC = argp-> Ida;
-	
-	TLibro libro = {};
-	
-	if(idAdmin != idAdminC){
+	if(idAdmin != argp-> Ida){
 		result = -1;
 	}else{
-		if(archivo == NULL){
-			result = -1;
 		
-		}
-		
+		FILE *archivo = fopen(argp->Datos, "rb");
+	
+		if(archivo != NULL){
+			
 		fread(&numLibros, sizeof(numLibros), 1, archivo);
 		
-		
+		Biblioteca = (TLibro *) malloc(sizeof(TLibro)*numLibros);
+
 		
 		if(Biblioteca == NULL){
 			perror("ERROR: No se ha reservado memoria para la biblioteca");
 		}else{
 		
-			fread(Biblioteca, sizeof(libro) * numLibros, numLibros, archivo);
+			fread(Biblioteca, sizeof(TLibro), numLibros, archivo);
 		}
 		fclose(archivo);
 		
 		result = numLibros;
+		}
+		else
+		   result = -1;		
 	
 	}
 	
@@ -171,9 +169,7 @@ nlibros_1_svc(int *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	/*
-	 * insert server code here
-	 */
+	result = numLibros;
 
 	return &result;
 }
@@ -195,9 +191,12 @@ descargar_1_svc(TPosicion *argp, struct svc_req *rqstp)
 {
 	static TLibro  result;
 
-	/*
-	 * insert server code here
-	 */
+	/*if(argp->Pos < 0 || argp->Pos >= numLibros){
+	perror("ERROR. La posicion no esta permitida\n");
+	return NULL;
+	}
+*/
+	result = Biblioteca[argp->Pos];
 
 	return &result;
 }

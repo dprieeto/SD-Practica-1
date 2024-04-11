@@ -11,6 +11,7 @@
 #include <string.h>
 #include <stdio.h> 
 #include <ctype.h>
+#include <stdbool.h>
 
 
 #define Cls system("clear")
@@ -36,12 +37,8 @@ gestorbiblioteca_1(char *host)
 	TComRet  retirar_1_arg;
 	bool_t  *result_8;
 	TOrdenacion  ordenar_1_arg;
-	int  *result_9;
-	int  nlibros_1_arg;
 	int  *result_10;
 	TConsulta  buscar_1_arg;
-	TLibro  *result_11;
-	TPosicion  descargar_1_arg;
 	int  *result_12;
 	TPosicion  prestar_1_arg;
 	int  *result_13;
@@ -219,6 +216,10 @@ int main (int argc, char *argv[])
 	char *host;
 	TConsulta  cargardatos_1_arg;
 	int  conexion_1_arg;
+	int  nlibros_1_arg;
+	TPosicion  descargar_1_arg;
+	TLibro  *result_libro;
+	
 	bool_t  *result_bool;
 	int  *result_int;
 	char user[50];
@@ -226,6 +227,8 @@ int main (int argc, char *argv[])
 	int opc1 = 1;
 	int opc2 = 0;
 	int idAdmin = 0;
+	
+	bool registrado = false;
 	
 	if (argc < 2) {
 		printf ("usage: %s server_host\n", argv[0]);
@@ -250,33 +253,38 @@ int main (int argc, char *argv[])
 	switch(opc1){
 	
 		case 1:	
-			printf("\t***REGISTRAR ADMINISTRADOR***\n");
-			printf("Introduce el nombre del admin(admin): ");
-			scanf("%s",user);
-			printf("Introduce el password del admin(1234): ");
-			scanf("%d",&pass);
-			conexion_1_arg = pass;
-			result_int = conexion_1(&conexion_1_arg, clnt);
-			
-			printf("El valor del resultado es %d.\n", *result_int);
-			if (result_int == (int *)NULL)
-			{
-				clnt_perror(clnt, "call failed");
-			}
-			else if (*result_int == -2)
-			{
-				printf("ERROR. Password incorrecta\n");
-			}
-			else if (*result_int == -1)
-			{
-				printf("ERROR. Administrador ya logeuado\n");
-			}
-			else
-			{
-			printf("CONTRASEÑA CORRECTA");
-			 idAdmin = *result_int;
-			 
 		
+			
+			if(registrado == false){
+				
+				printf("\t***REGISTRAR ADMINISTRADOR***\n");
+				printf("Introduce el nombre del admin(admin): ");
+				scanf("%s",user);
+				printf("Introduce el password del admin(1234): ");
+				scanf("%d",&pass);
+				conexion_1_arg = pass;
+				result_int = conexion_1(&conexion_1_arg, clnt);
+				
+				printf("El valor del resultado es %d.\n", *result_int);
+				if (result_int == (int *)NULL)
+				{
+					clnt_perror(clnt, "call failed");
+				}
+				else if (*result_int == -2)
+				{
+					printf("ERROR. Password incorrecta\n");
+				}
+				else if (*result_int == -1)
+				{
+					printf("ERROR. Administrador ya logeuado\n");
+				}else{
+				printf("CONTRASEÑA CORRECTA");
+			      	 idAdmin = *result_int;
+				registrado = true;}
+			
+			}else
+			{
+			
 			opc2 = MenuAdministracion();
 				switch(opc2){
 					case 1:
@@ -354,6 +362,36 @@ int main (int argc, char *argv[])
 					case 8:
 						Cls;
 						printf("\t***LISTAR LIBROS***\n");
+						
+						result_int = nlibros_1(&nlibros_1_arg, clnt);
+						if(result_int == (int *) NULL){
+							clnt_perror(clnt, "call failed" );
+						}else{
+							int totalLibros = *result_int;
+							printf("Total libros: %d\n", *result_int);
+							if(totalLibros == 0){
+								printf("No hay libros cargados");
+							}else{
+							
+							printf("POS TITULO                                 \tISBN             DIS PRE RES\n");
+            						printf(" AUTOR                                   PAIS (IDIOMA)    AÑO\n");
+            						printf("*********************************************************************************************\n");
+							descargar_1_arg.Ida=idAdmin;
+							for(int i = 0; i < totalLibros; i++){
+								descargar_1_arg.Pos = i;
+								result_libro = descargar_1(&descargar_1_arg, clnt);
+								
+								if(result_libro == (TLibro *)NULL){
+								printf("ERROR. No se han obtenido los detalles del libro %d\n", i + 1);
+								}else{
+									MostrarLibro(result_libro, i, FALSE);
+								}
+							
+							    }
+							
+							}
+						}
+						
 						break;
 					case 0:
 						Cls;
@@ -367,61 +405,15 @@ int main (int argc, char *argv[])
 			break;
 		case 2:
 			Cls;
-			char campo[50];
-			char codigo;
 			printf("\t***CONSULTA DE LIBROS***\n");
-			printf("\nIntroduce el texto a buscar: ");
-			scanf("%s", campo);
-			do {
-				printf("\n\tTexto a buscar: %s", campo);
-				printf("\n\tCodigo de consulta:\n");
-				printf("\tI.- Por Isbn\n");
-				printf("\tT.- Por Titulo\n");
-				printf("\tA.- Por Autor\n");
-				printf("\tP.- Por Pais\n");
-				printf("\tD.- Por Idioma\n");
-				printf("\t*.- Por todos los campos\n");
-				printf("\nIntroduce codigo: ");
-				scanf(" %c", &codigo); //" %c" para que ignore cualquier espacio en blanco
-				
-			} while(codigo!='I' && codigo!='T' && codigo!='A' && codigo!='P' && codigo!='D' && codigo!='*');
-			
-			// acceder al registro de libros o cargarlos para buscarlo?
-			printf("\nHa elegido la opcion : %c\n", codigo);
-				
-			//mostrar libros
-			
-			//Pause;
 			break;
 		case 3:
 			Cls;
 			printf("\t***PRESTAMO DE LIBROS***\n");
-			
-			
-			
 			break;
 		case 4:
 			Cls;
 			printf("\t***DEVOLUCION DE LIBROS***\n");
-			char isbn[40];
-			char respuesta;
-			int posicion;
-			printf("\nIntroduce el Isbn a buscar: ");
-			scanf("%s", isbn);
-			
-			//mostrar libros
-			do {
-				printf("\nQuieres devolver algun libro de la biblioteca (s/n)? ");
-				scanf(" %c", &respuesta);
-			} while(respuesta!='s' && respuesta!='n');
-			if(respuesta=='s') {
-				printf("\nIntroduce la posicion del libro a devolver: ");
-				scanf("%d", &posicion);
-				
-				// devlver libro
-				
-				printf("\n*** Se ha devuelto correctamente el libro y se pondra en la estanteria. ***\n");
-			}
 			break;
 
 	
