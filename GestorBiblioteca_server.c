@@ -133,9 +133,20 @@ comprar_1_svc(TComRet *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	/*
-	 * insert server code here
-	 */
+	int i = 0;
+	 bool_t encontrado = FALSE;
+	do{
+		if(strstr(argp->Isbn, Biblioteca[i].Isbn) != NULL){
+					encontrado = TRUE;
+			}else i++;
+	}while(!encontrado && i < numLibros);
+
+	if(encontrado){
+	Biblioteca[i].NoLibros += argp->NoLibros;
+		result = Biblioteca[i].NoLibros;
+	}else{
+	perror("El libro no se ha encontrado");
+	}
 
 	return &result;
 }
@@ -145,9 +156,20 @@ retirar_1_svc(TComRet *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	/*
-	 * insert server code here
-	 */
+	int i = 0;
+	 bool_t encontrado = FALSE;
+	do{
+		if(strstr(argp->Isbn, Biblioteca[i].Isbn) != NULL){
+					encontrado = TRUE;
+			}else i++;
+	}while(!encontrado && i < numLibros);
+
+	if(encontrado){
+	Biblioteca[i].NoLibros -= argp->NoLibros;
+		result = Biblioteca[i].NoLibros;
+	}else{
+	perror("El libro no se ha encontrado");
+	}
 
 	return &result;
 }

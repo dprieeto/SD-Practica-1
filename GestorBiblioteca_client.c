@@ -33,10 +33,7 @@ gestorbiblioteca_1(char *host)
 	int  desconexion_1_arg;
 	int  guardardatos_1_arg;
 	TNuevo  nuevolibro_1_arg;
-	int  *result_6;
-	TComRet  comprar_1_arg;
 	int  *result_7;
-	TComRet  retirar_1_arg;
 	bool_t  *result_8;
 	TOrdenacion  ordenar_1_arg;
 	int  *result_10;
@@ -67,10 +64,6 @@ gestorbiblioteca_1(char *host)
 		clnt_perror (clnt, "call failed");
 	}
 
-	result_6 = comprar_1(&comprar_1_arg, clnt);
-	if (result_6 == (int *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
 	result_7 = retirar_1(&retirar_1_arg, clnt);
 	if (result_7 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
@@ -206,54 +199,48 @@ void FiltrarLibros(TLibro *L, char tipo, char *cadena, int nLibros){
 
 	TLibro *librosFiltrados;
 	int nLibrosFiltrados = 0;
-
+        
+        bool_t b;
 	for(int i = 0; i < nLibros; i++)
 	{
+		b=false;
 		switch(tipo){
 
 			case 'I':
-				
 				if(strstr(L->Isbn, cadena) != NULL){
-					MostrarLibro(L, i, FALSE);
+					b=TRUE;
 				}
-				
 				break;
 			case 'T':
 				if(strstr(L->Titulo, cadena) != NULL){
-					MostrarLibro(L, i, FALSE);
+					b==TRUE;	
 				}
 				break;
 			case 'A':
 				if(strstr(L->Autor, cadena) != NULL){
-					MostrarLibro(L, i, FALSE);
+					b==TRUE;	
 				}
 				break;
 			case 'P':
 				if(strstr(L->Pais, cadena) != NULL){
-					MostrarLibro(L, i, FALSE);
+					b==TRUE;	
 				}
 				break;
 			case 'D':
 				if(strstr(L->Idioma, cadena) != NULL){
-					MostrarLibro(L, i, FALSE);
+					b==TRUE;	
 				}
 				break;
 			case '*':
 				
-				if(strstr(L->Isbn, cadena) != NULL){
-					MostrarLibro(L, i, FALSE);
-				}else if(strstr(L->Titulo, cadena) != NULL){
-					MostrarLibro(L, i, FALSE);
-				}else if(strstr(L->Autor, cadena) != NULL){
-					MostrarLibro(L, i, FALSE);
-				}else if(strstr(L->Pais, cadena) != NULL){
-					MostrarLibro(L, i, FALSE);
-				}else if(strstr(L->Idioma, cadena) != NULL){
-					MostrarLibro(L, i, FALSE);
+				if(strstr(L->Isbn, cadena) != NULL || strstr(L->Titulo, cadena) != NULL || strstr(L->Autor, cadena) != NULL || strstr(L->Pais, cadena) != NULL || L->Idioma, cadena)    					{
+				b==TRUE;	
 				}
 				break;
 
 		}
+		if (b==TRUE)
+			MostrarLibro(L, i, FALSE);
 	}
 
 
@@ -269,6 +256,8 @@ int main (int argc, char *argv[])
 	int  nlibros_1_arg;
 	TPosicion  descargar_1_arg;
 	TLibro  *result_libro;
+	TComRet  comprar_1_arg;
+	TComRet  retirar_1_arg;
 	
 	bool_t  *result_bool;
 	int  *result_int;
@@ -397,10 +386,50 @@ int main (int argc, char *argv[])
 					case 4:
 						Cls;
 						printf("\t***COMPRAR LIBROS***\n");
+						printf("\tIntroduce el Isbn a buscar: ");
+						scanf("%s", comprar_1_arg.Isbn);	
+						
+						char respuesta;	
+						//MostrarLibro(comprar_1_arg->Libro, i, FALSE);	
+						printf("\t¿Es este el libro que deseas comprar mas unidades? (s/n)");
+						scanf("%c", &respuesta);
+						
+						
+						comprar_1_arg.Ida = idAdmin;
+						printf("Introduce Numero de Libros comprados: ");
+						scanf("%d",&comprar_1_arg.NoLibros);
+						
+						result_int = comprar_1(&comprar_1_arg, clnt);
+							if (result_int == (int *) NULL) {
+								clnt_perror (clnt, "call failed");
+							}else{
+								printf("**Se han añadido los nuevos libros**");
+							}
+							
+								
 						break;
 					case 5:
 						Cls;
 						printf("\t***RETIRAR LIBROS***\n");
+						printf("\tIntroduce el Isbn a buscar: ");
+						scanf("%s", retirar_1_arg.Isbn);	
+						
+						char respuesta2;	
+						//MostrarLibro(comprar_1_arg->Libro, i, FALSE);	
+						printf("\t¿Es este el libro que deseas comprar mas unidades? (s/n)");
+						scanf("%c", &respuesta);
+						
+						
+						comprar_1_arg.Ida = idAdmin;
+						printf("Introduce Numero de Libros comprados: ");
+						scanf("%d",&retirar_1_arg.NoLibros);
+						
+						result_int = retirar_1(&retirar_1_arg, clnt);
+							if (result_int == (int *) NULL) {
+								clnt_perror (clnt, "call failed");
+							}else{
+								printf("**Se han añadido los nuevos libros**");
+							}
 						break;
 					case 6:
 						Cls;
