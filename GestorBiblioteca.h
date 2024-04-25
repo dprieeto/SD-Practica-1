@@ -74,8 +74,8 @@ extern  bool_t * desconexion_1_svc(int *, struct svc_req *);
 extern  int * cargardatos_1(TConsulta *, CLIENT *);
 extern  int * cargardatos_1_svc(TConsulta *, struct svc_req *);
 #define GuardarDatos 4
-extern  bool_t * guardardatos_1(int *, CLIENT *);
-extern  bool_t * guardardatos_1_svc(int *, struct svc_req *);
+extern  int * guardardatos_1(int *, CLIENT *);
+extern  int * guardardatos_1_svc(int *, struct svc_req *);
 #define NuevoLibro 5
 extern  int * nuevolibro_1(TNuevo *, CLIENT *);
 extern  int * nuevolibro_1_svc(TNuevo *, struct svc_req *);

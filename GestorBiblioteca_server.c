@@ -5,7 +5,7 @@
  */
 
 #include "GestorBiblioteca.h"
-
+#include <unistd.h>
 #define MAX_LIBROS 10000	
 
 TLibro *Biblioteca = NULL;
@@ -58,7 +58,7 @@ desconexion_1_svc(int *argp, struct svc_req *rqstp)
 int *
 cargardatos_1_svc(TConsulta *argp, struct svc_req *rqstp)
 {
-	printf("Ejecucion cargar datos servidor");
+	//printf("Ejecucion cargar datos servidor");
 	static int  result;
 	
 	if(idAdmin != argp-> Ida){
@@ -69,7 +69,7 @@ cargardatos_1_svc(TConsulta *argp, struct svc_req *rqstp)
 	
 		if(archivo != NULL){
 			
-		fread(&numLibros, sizeof(numLibros), 1, archivo);
+		result = fread(&numLibros, sizeof(numLibros), 1, archivo);
 		
 		Biblioteca = (TLibro *) malloc(sizeof(TLibro)*numLibros);
 
@@ -81,7 +81,7 @@ cargardatos_1_svc(TConsulta *argp, struct svc_req *rqstp)
 			fread(Biblioteca, sizeof(TLibro), numLibros, archivo);
 		}
 		fclose(archivo);
-		
+		strcpy(nameFich, argp->Datos);
 		result = numLibros;
 		}
 		else
@@ -92,16 +92,54 @@ cargardatos_1_svc(TConsulta *argp, struct svc_req *rqstp)
 	return &result;
 }
 
-bool_t *
+int *
 guardardatos_1_svc(int *argp, struct svc_req *rqstp)
 {
-	static bool_t  result;
-
-	/*
-	 * insert server code here
-	 */
-
+	static int  result, valor;
+	
+	if(idAdmin != *argp){
+		result = -1;
+	}else{
+		FILE *archivo = fopen(nameFich, "w+b");
+		
+		/*
+		if (access(argp->Datos, F_OK) == 0) {
+		    // el archivo existe se abre en modo de escritura
+		    archivo = fopen(argp->Datos, "wb");
+		} else {
+		    // el archivo no existe se crea en modo de escritura
+		    archivo = fopen(argp->Datos, "wb+");
+		}*/		
+	
+		if(archivo != NULL){
+			// escribir el numero de libros en el fichero:
+			valor = fwrite(&numLibros, sizeof(numLibros), 1, archivo);
+			
+			if(valor!=1) {
+				perror("\nError al escribir el numero de libros.");
+				result = -2;				
+			} else {
+				//guardar los datos de los libros:
+				
+				//Biblioteca = (TLibro *) malloc(sizeof(TLibro)*numLibros); //necesario?
+				
+				valor = fwrite(Biblioteca, sizeof(TLibro), numLibros, archivo);
+				
+				if(valor != numLibros) {
+					perror("\nError al escribir los datos de los libros.");
+					result = -3;
+				} else {
+					result = 0; //datos guardados
+				}
+			}
+			fclose(archivo);	
+		} else {
+			perror("\nError al abrir el archivo");
+			result = -4;
+		}	
+	}
 	return &result;
+		
 }
 
 int *

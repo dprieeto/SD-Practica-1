@@ -251,6 +251,7 @@ int main (int argc, char *argv[])
 {
 	char *host;
 	TConsulta  cargardatos_1_arg;
+	TConsulta guardardatos_1_arg;
 	TConsulta  buscar_1_arg;
 	int  conexion_1_arg;
 	int  nlibros_1_arg;
@@ -261,6 +262,7 @@ int main (int argc, char *argv[])
 	
 	bool_t  *result_bool;
 	int  *result_int;
+	int *numLibros;
 	char user[50];
 	char text[50];
 	int pass = 0;
@@ -316,7 +318,7 @@ int main (int argc, char *argv[])
 				}
 				else if (*result_int == -1)
 				{
-					printf("ERROR. Administrador ya logeuado\n");
+					printf("ERROR. Administrador ya logueado\n");
 				}else{
 				printf("CONTRASEÑA CORRECTA");
 			      	 idAdmin = *result_int;
@@ -349,7 +351,29 @@ int main (int argc, char *argv[])
 						break;
 					case 2:
 					 	Cls;
+					 	Cadena fichero;
+						guardardatos_1_arg;
 						printf("\t***GUARDAR DATOS BIBLIOTECA***\n");
+						
+						// llama a la funcion para guardar los datos en el fichero:
+						result_int = guardardatos_1(&idAdmin, clnt);
+						
+						if(*result_int == 0) {
+							numLibros = nlibros_1(&nlibros_1_arg, clnt);
+							printf("DATOS GUARDADOS CORRECTAMENTE, Numero de libros guardados: %d\n", *numLibros);
+						} else if (result_int == (int *) NULL ) {
+							clnt_perror (clnt, "call failed");
+						} else if(*result_int == -1){
+							printf("ERROR. Id admin: %d\n", *result_int);
+						} else if (*result_int == -2) {
+							printf("\nError al escribir el numero de libros.");
+						} else if (*result_int == -3) {
+							printf("\nSe ha producido un error al guardar los datos.");
+						}
+						
+						Pause;
+						
+						
 						break;
 					case 3:
 						Cls;
@@ -529,7 +553,46 @@ int main (int argc, char *argv[])
 			break;
 		case 2:
 			Cls;
-			printf("\t***CONSULTA DE LIBROS***\n");
+			printf("\t***CONSULTA DE LIBROS***\n");		
+			printf("Introduce el texto a Buscar: ");
+			scanf("%s",text);
+			printf("\n");
+			printf("Codigo de consulta\n");
+			printf("I.- Por Isbn\n");
+			printf("T.- Por Titulo\n");
+			printf("A.- Por Autor\n");
+			printf("P.- Por Pais\n");
+			printf("D.- Por Idioma\n");
+			printf("*.- Por todos los campos\n");
+			
+			char opcConsulta;
+			printf("Introduce Codigo: ");
+			scanf(" %c",&opcConsulta);	
+    			result_int = nlibros_1(&nlibros_1_arg, clnt);
+				if(result_int == (int *) NULL){
+					clnt_perror(clnt, "call failed" );
+				}else{
+					int totalLibros = *result_int;
+					printf("Total libros: %d\n", *result_int);
+					if(totalLibros == 0){
+						printf("No hay libros cargados");
+					}else{		
+					printf("POS TITULO                                 \tISBN         			     DIS PRE RES\n");
+					printf(" AUTOR                                   PAIS (IDIOMA)    AÑO\n");
+printf("*********************************************************************************************\n");
+					descargar_1_arg.Ida=idAdmin;
+					for(int i = 0; i < totalLibros; i++){
+						descargar_1_arg.Pos = i;
+						result_libro = descargar_1(&descargar_1_arg, clnt);
+						
+						if(result_libro == (TLibro *)NULL){
+						printf("ERROR. No se han obtenido los detalles del libro %d\n", i + 1);
+						}else{
+							FiltrarLibros(result_libro, opcConsulta, text, 1);
+						}
+					}		
+				}
+			}
 			break;
 		case 3:
 			Cls;
