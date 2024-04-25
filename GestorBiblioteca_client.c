@@ -21,7 +21,7 @@ void menu();
 int MenuPrincipal();
 int MenuAdministracion();
 void MostrarAviso(const char* texto);
-void FiltrarLibros(TLibro *L, char tipo, char *cadena, int nLibros);
+bool_t FiltrarLibros(TLibro *L, char tipo, char *cadena, int nLibros);
 
 
 void
@@ -145,7 +145,7 @@ int MenuAdministracion()
 		
 		if(Salida < 0 || Salida >8)
 			MostrarAviso("\n\n *** Error en la entrada de Datos.***\n\n");
-	 }while (Salida<0 || Salida>8);
+	 }while (Salida<0 /*|| Salida>8*/);
 	 return Salida;
 }
 
@@ -195,15 +195,15 @@ void MostrarLibro(TLibro *L, int Pos, bool_t Cabecera)
 	printf("     %s%s%-*d\n",A ,PI,12, L->Anio);
 }
 
-void FiltrarLibros(TLibro *L, char tipo, char *cadena, int nLibros){
+bool_t FiltrarLibros(TLibro *L, char tipo, char *cadena, int nLibros){
 
 	TLibro *librosFiltrados;
 	int nLibrosFiltrados = 0;
         
         bool_t b;
-	for(int i = 0; i < nLibros; i++)
-	{
-		b=false;
+	//for(int i = 0; i < nLibros; i++)
+	//{
+		b=FALSE;
 		switch(tipo){
 
 			case 'I':
@@ -213,36 +213,37 @@ void FiltrarLibros(TLibro *L, char tipo, char *cadena, int nLibros){
 				break;
 			case 'T':
 				if(strstr(L->Titulo, cadena) != NULL){
-					b==TRUE;	
+					b=TRUE;	
 				}
 				break;
 			case 'A':
 				if(strstr(L->Autor, cadena) != NULL){
-					b==TRUE;	
+					b=TRUE;	
 				}
 				break;
 			case 'P':
 				if(strstr(L->Pais, cadena) != NULL){
-					b==TRUE;	
+					b=TRUE;	
 				}
 				break;
 			case 'D':
 				if(strstr(L->Idioma, cadena) != NULL){
-					b==TRUE;	
+					b=TRUE;	
 				}
 				break;
 			case '*':
 				
-				if(strstr(L->Isbn, cadena) != NULL || strstr(L->Titulo, cadena) != NULL || strstr(L->Autor, cadena) != NULL || strstr(L->Pais, cadena) != NULL || L->Idioma, cadena)    					{
-				b==TRUE;	
+				if(strstr(L->Isbn, cadena) != NULL || strstr(L->Titulo, cadena) != NULL || strstr(L->Autor, cadena) != NULL || strstr(L->Pais, cadena) != NULL || strstr(L->Idioma, cadena))    					{
+				b=TRUE;	
 				}
 				break;
 
-		}
+		}/*
 		if (b==TRUE)
 			MostrarLibro(L, i, FALSE);
 	}
-
+	*/
+	return b;
 
 }
 
@@ -482,7 +483,7 @@ int main (int argc, char *argv[])
 									clnt_perror(clnt, "call failed" );
 								}else{
 									int totalLibros = *result_int;
-									printf("Total libros: %d\n", *result_int);
+									
 									if(totalLibros == 0){
 										printf("No hay libros cargados");
 									}else{
@@ -491,6 +492,7 @@ int main (int argc, char *argv[])
 			    						printf(" AUTOR                                   PAIS (IDIOMA)    AÑO\n");
 			    						printf("*********************************************************************************************\n");
 									descargar_1_arg.Ida=idAdmin;
+									int j = 0;
 									for(int i = 0; i < totalLibros; i++){
 										descargar_1_arg.Pos = i;
 										result_libro = descargar_1(&descargar_1_arg, clnt);
@@ -498,14 +500,18 @@ int main (int argc, char *argv[])
 										if(result_libro == (TLibro *)NULL){
 										printf("ERROR. No se han obtenido los detalles del libro %d\n", i + 1);
 										}else{
-											FiltrarLibros(result_libro, opcBuscar, text, 1);
+											bool_t cierto = FiltrarLibros(result_libro, opcBuscar, text, 1);
+											if(cierto==TRUE) {
+												j++;
+												MostrarLibro(result_libro, j-1, FALSE);
+											} 
+											
 										}
 									
 									    }
-										
+									    printf("Total libros: %d\n", j);	
 							}
-						}
-							
+						}							
 						break;
 					case 8:
 						Cls;
@@ -564,33 +570,40 @@ int main (int argc, char *argv[])
 			printf("P.- Por Pais\n");
 			printf("D.- Por Idioma\n");
 			printf("*.- Por todos los campos\n");
-			
 			char opcConsulta;
 			printf("Introduce Codigo: ");
 			scanf(" %c",&opcConsulta);	
-    			result_int = nlibros_1(&nlibros_1_arg, clnt);
-				if(result_int == (int *) NULL){
-					clnt_perror(clnt, "call failed" );
-				}else{
-					int totalLibros = *result_int;
-					printf("Total libros: %d\n", *result_int);
-					if(totalLibros == 0){
-						printf("No hay libros cargados");
-					}else{		
-					printf("POS TITULO                                 \tISBN         			     DIS PRE RES\n");
-					printf(" AUTOR                                   PAIS (IDIOMA)    AÑO\n");
-printf("*********************************************************************************************\n");
-					descargar_1_arg.Ida=idAdmin;
-					for(int i = 0; i < totalLibros; i++){
-						descargar_1_arg.Pos = i;
-						result_libro = descargar_1(&descargar_1_arg, clnt);
-						
-						if(result_libro == (TLibro *)NULL){
-						printf("ERROR. No se han obtenido los detalles del libro %d\n", i + 1);
+	    			result_int = nlibros_1(&nlibros_1_arg, clnt);
+					if(result_int == (int *) NULL){
+						clnt_perror(clnt, "call failed" );
+					}else{
+						int totalLibros = *result_int;						
+						if(totalLibros == 0){
+							printf("No hay libros cargados");
 						}else{
-							FiltrarLibros(result_libro, opcConsulta, text, 1);
-						}
-					}		
+						printf("POS TITULO                                 \tISBN         			     DIS PRE RES\n");
+    						printf(" AUTOR                                   PAIS (IDIOMA)    AÑO\n");
+    						printf("*********************************************************************************************\n");
+						descargar_1_arg.Ida=idAdmin;
+						int j = 0;
+						for(int i = 0; i < totalLibros; i++){
+							descargar_1_arg.Pos = i;
+							result_libro = descargar_1(&descargar_1_arg, clnt);
+							
+							if(result_libro == (TLibro *)NULL){
+							printf("ERROR. No se han obtenido los detalles del libro %d\n", i + 1);
+							}else{
+								bool_t cierto = FiltrarLibros(result_libro, opcConsulta, text, 1);
+								if(cierto==TRUE) {
+									j++;
+									MostrarLibro(result_libro, j-1, FALSE);
+								} 
+								
+							}
+						
+						    }
+						    printf("Total libros: %d\n", j);
+							
 				}
 			}
 			break;
