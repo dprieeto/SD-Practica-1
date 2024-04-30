@@ -4,7 +4,6 @@
  */
 
 #include <memory.h> /* for memset */
-
 #include "GestorBiblioteca.h"
 
 /* Default timeout can be changed using clnt_control() */
@@ -55,10 +54,10 @@ cargardatos_1(TConsulta *argp, CLIENT *clnt)
 	return (&clnt_res);
 }
 
-int *
+bool_t *
 guardardatos_1(int *argp, CLIENT *clnt)
 {
-	static int clnt_res;
+	static bool_t clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
 	if (clnt_call (clnt, GuardarDatos,

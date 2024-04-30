@@ -265,11 +265,25 @@ int *
 prestar_1_svc(TPosicion *argp, struct svc_req *rqstp)
 {
 	static int  result;
-
-	/*
-	 * insert server code here
-	 */
-
+	int pos = argp->Pos;
+	
+	if(Biblioteca == NULL){
+		perror("ERROR. Biblioteca no inicializada");
+		result = -1;
+	}else if(pos < 0 || pos >=numLibros){
+		perror("ERROR.Posicion fuera de rango");
+		result = -2;
+	}else{
+		TLibro *libro = &Biblioteca[pos];
+		if(libro->NoLibros - libro->NoPrestados < 0){
+			perror("ERROR. No hay suficientes libros disponibles");
+			result = -3;
+		}else{
+		libro->NoPrestados+=1;
+		result = libro->NoPrestados;
+		}
+	}
+	
 	return &result;
 }
 
@@ -278,10 +292,24 @@ devolver_1_svc(TPosicion *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	/*
-	 * insert server code here
-	 */
-
+	int pos = argp->Pos;
+	
+	if(Biblioteca == NULL){
+		perror("ERROR. Biblioteca no inicializada");
+		result = -1;
+	}else if(pos < 0 || pos >=numLibros){
+		perror("ERROR.Posicion fuera de rango");
+		result = -2;
+	}else{
+		TLibro *libro = &Biblioteca[pos];
+		if(libro->NoPrestados == 0){
+			perror("ERROR. No hay libros prestados, por tanto no puedes devolverlo");
+			result = -3;
+		}else{
+		libro->NoPrestados-=1;
+		result = libro->NoPrestados;
+		}
+	}
 	return &result;
 }
 

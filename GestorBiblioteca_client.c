@@ -38,9 +38,7 @@ gestorbiblioteca_1(char *host)
 	TOrdenacion  ordenar_1_arg;
 	int  *result_10;
 	int  *result_12;
-	TPosicion  prestar_1_arg;
 	int  *result_13;
-	TPosicion  devolver_1_arg;
 
 #ifndef	DEBUG
 
@@ -77,10 +75,6 @@ gestorbiblioteca_1(char *host)
 		clnt_perror (clnt, "call failed");
 	}
 
-	result_12 = prestar_1(&prestar_1_arg, clnt);
-	if (result_12 == (int *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
 	result_13 = devolver_1(&devolver_1_arg, clnt);
 	if (result_13 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
@@ -260,6 +254,8 @@ int main (int argc, char *argv[])
 	TLibro  *result_libro;
 	TComRet  comprar_1_arg;
 	TComRet  retirar_1_arg;
+	TPosicion  prestar_1_arg;
+	TPosicion  devolver_1_arg;
 	
 	bool_t  *result_bool;
 	int  *result_int;
@@ -269,6 +265,8 @@ int main (int argc, char *argv[])
 	int pass = 0;
 	int opc1 = 1;
 	int opc2 = 0;
+	int opc3 = 10;
+	int opc4 = 0;
 	int idAdmin = 0;
 	
 	bool registrado = false;
@@ -458,7 +456,27 @@ int main (int argc, char *argv[])
 						break;
 					case 6:
 						Cls;
+						
 						printf("\t***ORDENAR LIBROS***\n");
+						
+
+						printf("\n");
+						printf("Codigo de ordenacion\n");
+						printf("0.- Por Isbn\n");
+						printf("1.- Por Titulo\n");
+						printf("2.- Por Autor\n");
+						printf("3.- Por Anio\n");
+						printf("4.- Por Pais\n");
+						printf("5.- Por Idioma\n");
+						printf("6.- Por nº libros Disponibles\n");
+						printf("7.- Por nº libros Prestados\n");
+						printf("8.- Por nº libros en espera\n");
+					
+						printf("Introduce Codigo: ");
+						scanf("%d",&opc3);						
+						
+						
+						
 						break;	
 					case 7:
 						Cls;
@@ -596,7 +614,7 @@ int main (int argc, char *argv[])
 								bool_t cierto = FiltrarLibros(result_libro, opcConsulta, text, 1);
 								if(cierto==TRUE) {
 									j++;
-									MostrarLibro(result_libro, j-1, FALSE);
+									MostrarLibro(result_libro, i, FALSE);
 								} 
 								
 							}
@@ -615,16 +633,80 @@ int main (int argc, char *argv[])
 			scanf("%s",text);
 			printf("\n");
 			printf("Codigo de consulta\n");
-			printf("I.- Por Isbn");
-			printf("T.- Por Titulo");
-			printf("A.- Por Autor");
-			printf("P.- Por Pais");
-			printf("D.- Por Idioma");
-			printf("*.- Por todos los campos");
+			printf("I.- Por Isbn\n");
+			printf("T.- Por Titulo\n");
+			printf("A.- Por Autor\n");
+			printf("P.- Por Pais\n");
+			printf("D.- Por Idioma\n");
+			printf("*.- Por todos los campos\n");
 			
-			char opcBuscar[1];
+			char opcBuscar;
 			printf("Introduce Codigo: ");
-			scanf("%s",opcBuscar);
+			scanf(" %c", &opcBuscar);
+			
+			result_int = nlibros_1(&nlibros_1_arg, clnt);
+								if(result_int == (int *) NULL){
+									clnt_perror(clnt, "call failed" );
+								}else{
+									int totalLibros = *result_int;
+									
+									if(totalLibros == 0){
+										printf("No hay libros cargados");
+									}else{
+									
+									printf("POS TITULO                                 \tISBN         			     DIS PRE RES\n");
+			    						printf(" AUTOR                                   PAIS (IDIOMA)    AÑO\n");
+			    						printf("*********************************************************************************************\n");
+									descargar_1_arg.Ida=idAdmin;
+									int j = 0;
+									for(int i = 0; i < totalLibros; i++){
+										descargar_1_arg.Pos = i;
+										result_libro = descargar_1(&descargar_1_arg, clnt);
+										
+										if(result_libro == (TLibro *)NULL){
+										printf("ERROR. No se han obtenido los detalles del libro %d\n", i + 1);
+										}else{
+											bool_t cierto = FiltrarLibros(result_libro, opcBuscar, text, 1);
+											if(cierto==TRUE) {
+												j++;
+												MostrarLibro(result_libro, i, FALSE);
+											} 
+											
+										}
+									
+									    }
+									    printf("Total libros: %d\n", j);	
+							}
+							
+							char opcBuscar2;
+							printf("¿Quieres sacar algun libro de la biblioteca?(s/n) ");
+							scanf(" %c",&opcBuscar2);
+							
+							if(opcBuscar2 != 's'){
+							
+							}else{
+								printf("Introduce la posicion del libro a realizar su prestamo: ");
+								scanf("%d",&opc3);
+								prestar_1_arg.Pos = opc3-1;
+								
+								result_int = prestar_1(&prestar_1_arg, clnt);
+								if (result_int == (int *) NULL) {
+									clnt_perror (clnt, "call failed");
+								}else if(*result_int == -1){
+									printf("ERROR. La biblioteca no se ha inicializado");
+								}else if(*result_int == -2){
+									printf("ERROR. Algo");
+								}else if(*result_int == -3){
+									printf("ERROR. Algo");
+								}else{
+									printf("**EL prestamo se ha concedido, recoge el libro en el mostrador.**\n");
+								}
+							}
+							
+							
+							
+							
+						}	
 			
 			
 			
@@ -632,6 +714,85 @@ int main (int argc, char *argv[])
 		case 4:
 			Cls;
 			printf("\t***DEVOLUCION DE LIBROS***\n");
+			printf("Introduce el texto a Buscar: ");
+			scanf("%s",text);
+			printf("\n");
+			printf("Codigo de consulta\n");
+			printf("I.- Por Isbn\n");
+			printf("T.- Por Titulo\n");
+			printf("A.- Por Autor\n");
+			printf("P.- Por Pais\n");
+			printf("D.- Por Idioma\n");
+			printf("*.- Por todos los campos\n");
+			
+			char opcBuscar2;
+			printf("Introduce Codigo: ");
+			scanf(" %c", &opcBuscar2);
+			
+			result_int = nlibros_1(&nlibros_1_arg, clnt);
+								if(result_int == (int *) NULL){
+									clnt_perror(clnt, "call failed" );
+								}else{
+									int totalLibros = *result_int;
+									
+									if(totalLibros == 0){
+										printf("No hay libros cargados");
+									}else{
+									
+									printf("POS TITULO                                 \tISBN         			     DIS PRE RES\n");
+			    						printf(" AUTOR                                   PAIS (IDIOMA)    AÑO\n");
+			    						printf("*********************************************************************************************\n");
+									descargar_1_arg.Ida=idAdmin;
+									int j = 0;
+									for(int i = 0; i < totalLibros; i++){
+										descargar_1_arg.Pos = i;
+										result_libro = descargar_1(&descargar_1_arg, clnt);
+										
+										if(result_libro == (TLibro *)NULL){
+										printf("ERROR. No se han obtenido los detalles del libro %d\n", i + 1);
+										}else{
+											bool_t cierto = FiltrarLibros(result_libro, opcBuscar, text, 1);
+											if(cierto==TRUE) {
+												j++;
+												MostrarLibro(result_libro, i, FALSE);
+											} 
+											
+										}
+									
+									    }
+									    printf("Total libros: %d\n", j);	
+							}
+							
+							char opcBuscar2;
+							printf("¿Quieres sacar algun libro de la biblioteca?(s/n) ");
+							scanf(" %c",&opcBuscar2);
+							
+							if(opcBuscar2 != 's'){
+							
+							}else{
+							
+							printf("Introduce la posicion del libro a realizar la devolucion: ");
+							scanf("%d",&opc3);
+							devolver_1_arg.Pos = opc3-1;
+							
+							result_int = devolver_1(&devolver_1_arg, clnt);
+							if (result_int == (int *) NULL) {
+								clnt_perror (clnt, "call failed");
+							}else if(*result_int == -1){
+								printf("ERROR. La biblioteca no se ha inicializado");
+							}else if(*result_int == -2){
+								printf("ERROR. Algo");
+							}else if(*result_int == -3){
+								printf("ERROR. Algo");
+							}else{
+								printf("**Se ha devuelto el libro y se pondra en la estanteria.**\n");
+							}
+							
+							}
+						}	
+			
+			
+			
 			break;
 
 	
