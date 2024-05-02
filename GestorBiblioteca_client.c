@@ -306,7 +306,7 @@ int main (int argc, char *argv[])
 				conexion_1_arg = pass;
 				result_int = conexion_1(&conexion_1_arg, clnt);
 				
-				printf("El valor del resultado es %d.\n", *result_int);
+				//printf("El valor del resultado es %d.\n", *result_int);
 				if (result_int == (int *)NULL)
 				{
 					clnt_perror(clnt, "call failed");
@@ -323,8 +323,9 @@ int main (int argc, char *argv[])
 			      	 idAdmin = *result_int;
 				registrado = true;}
 			
-			}else
-			{
+			}
+			
+			if(registrado == true){
 			
 			opc2 = MenuAdministracion();
 				switch(opc2){
@@ -345,7 +346,8 @@ int main (int argc, char *argv[])
 							printf("ERROR. Numero de libros cargados: %d\n", *result_int);
 							}else
 							{ 
-							printf("DATOS INTRODUCIDOS CORRECTAMENTE, Numero de libros cargados: %d\n", *result_int);
+							printf("***DATOS INTRODUCIDOS CORRECTAMENTE***\n");
+							printf("Numero de libros cargados: %d\n", *result_int);
 							}
 						break;
 					case 2:
@@ -781,9 +783,9 @@ int main (int argc, char *argv[])
 							}else if(*result_int == -1){
 								printf("ERROR. La biblioteca no se ha inicializado");
 							}else if(*result_int == -2){
-								printf("ERROR. Algo");
+								printf("ERROR. No se puede prestar el libro");
 							}else if(*result_int == -3){
-								printf("ERROR. Algo");
+								printf("ERROR. No se puede prestar el libro");
 							}else{
 								printf("**Se ha devuelto el libro y se pondra en la estanteria.**\n");
 							}
