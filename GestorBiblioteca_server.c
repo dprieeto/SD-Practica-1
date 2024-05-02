@@ -48,9 +48,10 @@ desconexion_1_svc(int *argp, struct svc_req *rqstp)
 {
 	static bool_t  result;
 
-	/*
-	 * insert server code here
-	 */
+	if(idAdmin != -1){
+		idAdmin = -1;
+		result = idAdmin;
+	}
 
 	return &result;
 }

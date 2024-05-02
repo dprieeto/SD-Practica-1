@@ -29,16 +29,8 @@ gestorbiblioteca_1(char *host)
 {	
 	
  	CLIENT *clnt;
-	bool_t  *result_2;
-	int  desconexion_1_arg;
-	int  guardardatos_1_arg;
-	TNuevo  nuevolibro_1_arg;
-	int  *result_7;
 	bool_t  *result_8;
 	TOrdenacion  ordenar_1_arg;
-	int  *result_10;
-	int  *result_12;
-	int  *result_13;
 
 #ifndef	DEBUG
 
@@ -51,35 +43,11 @@ gestorbiblioteca_1(char *host)
 
 
 		
-/*
-
-	result_2 = desconexion_1(&desconexion_1_arg, clnt);
-	if (result_2 == (bool_t *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
-	result_4 = guardardatos_1(&guardardatos_1_arg, clnt);
-	if (result_4 == (bool_t *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
-
-	result_7 = retirar_1(&retirar_1_arg, clnt);
-	if (result_7 == (int *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
+/*	
 	result_8 = ordenar_1(&ordenar_1_arg, clnt);
 	if (result_8 == (bool_t *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
-	result_9 = nlibros_1(&nlibros_1_arg, clnt);
-	if (result_9 == (int *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
-
-	result_13 = devolver_1(&devolver_1_arg, clnt);
-	if (result_13 == (int *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
-
 */
 }
 
@@ -250,6 +218,7 @@ int main (int argc, char *argv[])
 	TConsulta  buscar_1_arg;
 	int  conexion_1_arg;
 	int  nlibros_1_arg;
+	int  desconexion_1_arg;
 	TPosicion  descargar_1_arg;
 	TLibro  *result_libro;
 	TComRet  comprar_1_arg;
@@ -294,8 +263,6 @@ int main (int argc, char *argv[])
 	switch(opc1){
 	
 		case 1:	
-		
-			
 			if(registrado == false){
 				
 				printf("\t***REGISTRAR ADMINISTRADOR***\n");
@@ -319,7 +286,7 @@ int main (int argc, char *argv[])
 				{
 					printf("ERROR. Administrador ya logueado\n");
 				}else{
-				printf("CONTRASEÑA CORRECTA");
+				printf("CONTRASEÑA CORRECTA\n");
 			      	 idAdmin = *result_int;
 				registrado = true;}
 			
@@ -799,6 +766,14 @@ int main (int argc, char *argv[])
 
 	
 	}
+		result_int = desconexion_1(&desconexion_1_arg, clnt);
+		if (result_int == (bool_t *) NULL) {
+			clnt_perror (clnt, "call failed");
+		}else {
+		printf("***DESCONEXION CON EXITO***\n");
+		registrado = false;
+		}
+	
 	Pause;
 	}while(opc1 != 0);
 
