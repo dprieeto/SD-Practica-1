@@ -270,18 +270,20 @@ prestar_1_svc(TPosicion *argp, struct svc_req *rqstp)
 	
 	if(Biblioteca == NULL){
 		perror("ERROR. Biblioteca no inicializada");
-		result = -1;
+		result = -2; // biblioteca no inicializada
 	}else if(pos < 0 || pos >=numLibros){
 		perror("ERROR.Posicion fuera de rango");
-		result = -2;
+		result = -1; // error fuera de rango
 	}else{
 		TLibro *libro = &Biblioteca[pos];
-		if(libro->NoLibros - libro->NoPrestados < 0){
-			perror("ERROR. No hay suficientes libros disponibles");
-			result = -3;
-		}else{
+		if(libro->NoLibros == 0){
+			//perror("ERROR. No hay suficientes libros disponibles");
+			libro->NoListaEspera += 1;
+			result = 0; // usuario en lista de espera
+		}else if(libro->NoLibros > 0){
 		libro->NoPrestados+=1;
-		result = libro->NoPrestados;
+		result = 1; // libro prestado
+		libro->NoLibros -=1; // restar un disponible?
 		}
 	}
 	
@@ -297,18 +299,22 @@ devolver_1_svc(TPosicion *argp, struct svc_req *rqstp)
 	
 	if(Biblioteca == NULL){
 		perror("ERROR. Biblioteca no inicializada");
-		result = -1;
+		result = -2;
 	}else if(pos < 0 || pos >=numLibros){
 		perror("ERROR.Posicion fuera de rango");
-		result = -2;
+		result = -1; // fuera de rango
 	}else{
 		TLibro *libro = &Biblioteca[pos];
 		if(libro->NoPrestados == 0){
 			perror("ERROR. No hay libros prestados, por tanto no puedes devolverlo");
-			result = -3;
-		}else{
-		libro->NoPrestados-=1;
-		result = libro->NoPrestados;
+			result = 2; // no hay libros prestados.
+		}else if(libro->NoListaEspera > 0){
+			libro->NoListaEspera -= 1;
+			result = 0; // se ha reducido la lista de espera
+		} else {
+			libro->NoPrestados-=1; // se quita un libro prestado
+			libro->NoLibros+=1;//se añade un libro mas disponible
+			result = 1; // el libro se ha devuelto y hay un libro disponible mas
 		}
 	}
 	return &result;

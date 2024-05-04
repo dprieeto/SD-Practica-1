@@ -293,7 +293,7 @@ int main (int argc, char *argv[])
 			}
 			
 			if(registrado == true){
-			
+			do {
 			opc2 = MenuAdministracion();
 				switch(opc2){
 					case 1:
@@ -381,22 +381,56 @@ int main (int argc, char *argv[])
 						printf("\tIntroduce el Isbn a buscar: ");
 						scanf("%s", comprar_1_arg.Isbn);	
 						
-						char respuesta;	
-						//MostrarLibro(comprar_1_arg->Libro, i, FALSE);	
-						printf("\t¿Es este el libro que deseas comprar mas unidades? (s/n)");
-						scanf("%c", &respuesta);
-						
-						
-						comprar_1_arg.Ida = idAdmin;
-						printf("Introduce Numero de Libros comprados: ");
-						scanf("%d",&comprar_1_arg.NoLibros);
-						
-						result_int = comprar_1(&comprar_1_arg, clnt);
-							if (result_int == (int *) NULL) {
-								clnt_perror (clnt, "call failed");
-							}else{
-								printf("**Se han añadido los nuevos libros**");
+						char respuesta;
+						bool encontrado = false;
+						TLibro *libro;	
+						int i = 0, pos;
+						//MostrarLibro(comprar_1_arg->Libro, i, FALSE);
+						result_int = nlibros_1(&nlibros_1_arg, clnt);
+						descargar_1_arg.Ida=idAdmin;
+						if(result_int == (int *) NULL){
+							clnt_perror(clnt, "call failed" );
+						}else{
+							int totalLibros = *result_int;
+							
+							if(totalLibros == 0) {
+								printf("No hay libros cargados");
+							} else {
+								while(i<totalLibros && !encontrado) {
+									descargar_1_arg.Pos = i;
+									libro = descargar_1(&descargar_1_arg, clnt);
+									
+									if(strcmp(libro->Isbn, comprar_1_arg.Isbn) == 0) {
+										pos = i;
+										encontrado = true;
+										
+									}
+									i++;
+								}
+								if(encontrado) {
+									MostrarLibro(libro, pos, TRUE);
+									printf("\t¿Es este el libro que deseas comprar mas unidades? (s/n)");
+									scanf(" %c", &respuesta);
+									if(respuesta=='s') {
+										comprar_1_arg.Ida = idAdmin;
+										printf("Introduce Numero de Libros a comprar: ");
+										scanf("%d",&comprar_1_arg.NoLibros);
+										
+										result_int = comprar_1(&comprar_1_arg, clnt);
+										if (result_int == (int *) NULL) {
+											clnt_perror (clnt, "call failed");
+										}else{
+											printf("**Se han añadido los nuevos libros**");
+										}
+									}
+								} else {
+									printf("No se ha encontrado ese libro.");
+								}	
 							}
+						}
+						
+							
+						
 							
 								
 						break;
@@ -498,7 +532,8 @@ int main (int argc, char *argv[])
 									    }
 									    printf("Total libros: %d\n", j);	
 							}
-						}							
+						}
+						Pause;							
 						break;
 					case 8:
 						Cls;
@@ -532,7 +567,7 @@ int main (int argc, char *argv[])
 							
 							}
 						}
-						
+						Pause;
 						break;
 					case 0:
 						Cls;
@@ -541,7 +576,8 @@ int main (int argc, char *argv[])
 					
 						}
 						
-			}
+			}while(opc2!=0);
+			} 
 		
 			break;
 		case 2:
