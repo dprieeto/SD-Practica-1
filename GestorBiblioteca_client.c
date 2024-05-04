@@ -629,6 +629,7 @@ int main (int argc, char *argv[])
 							
 				}
 			}
+			Pause;
 			break;
 		case 3:
 			Cls;
@@ -697,12 +698,12 @@ int main (int argc, char *argv[])
 								result_int = prestar_1(&prestar_1_arg, clnt);
 								if (result_int == (int *) NULL) {
 									clnt_perror (clnt, "call failed");
-								}else if(*result_int == -1){
-									printf("ERROR. La biblioteca no se ha inicializado");
 								}else if(*result_int == -2){
-									printf("ERROR. Algo");
-								}else if(*result_int == -3){
-									printf("ERROR. Algo");
+									printf("ERROR. La biblioteca no se ha inicializado");
+								}else if(*result_int == -1){
+									printf("ERROR. Posicion incorrecta");
+								}else if(*result_int == 0){
+									printf("** Usuario en lista de espera para obtener el libro.**\n");
 								}else{
 									printf("**EL prestamo se ha concedido, recoge el libro en el mostrador.**\n");
 								}
@@ -714,7 +715,7 @@ int main (int argc, char *argv[])
 						}	
 			
 			
-			
+			Pause;
 			break;
 		case 4:
 			Cls;
@@ -735,83 +736,80 @@ int main (int argc, char *argv[])
 			scanf(" %c", &opcBuscar2);
 			
 			result_int = nlibros_1(&nlibros_1_arg, clnt);
-								if(result_int == (int *) NULL){
-									clnt_perror(clnt, "call failed" );
-								}else{
-									int totalLibros = *result_int;
-									
-									if(totalLibros == 0){
-										printf("No hay libros cargados");
-									}else{
-									
-									printf("POS TITULO                                 \tISBN         			     DIS PRE RES\n");
-			    						printf(" AUTOR                                   PAIS (IDIOMA)    AÑO\n");
-			    						printf("*********************************************************************************************\n");
-									descargar_1_arg.Ida=idAdmin;
-									int j = 0;
-									for(int i = 0; i < totalLibros; i++){
-										descargar_1_arg.Pos = i;
-										result_libro = descargar_1(&descargar_1_arg, clnt);
-										
-										if(result_libro == (TLibro *)NULL){
-										printf("ERROR. No se han obtenido los detalles del libro %d\n", i + 1);
-										}else{
-											bool_t cierto = FiltrarLibros(result_libro, opcBuscar, text, 1);
-											if(cierto==TRUE) {
-												j++;
-												MostrarLibro(result_libro, i, FALSE);
-											} 
-											
-										}
-									
-									    }
-									    printf("Total libros: %d\n", j);	
-							}
+			if(result_int == (int *) NULL){
+				clnt_perror(clnt, "call failed" );
+			}else{
+				int totalLibros = *result_int;
+				
+				if(totalLibros == 0){
+					printf("No hay libros cargados");
+				}else{
+					printf("POS TITULO                                 \tISBN         			     DIS PRE RES\n");
+					printf(" AUTOR                                   PAIS (IDIOMA)    AÑO\n");
+					printf("*********************************************************************************************\n");
+					descargar_1_arg.Ida=idAdmin;
+					int j = 0;
+					for(int i = 0; i < totalLibros; i++){
+						descargar_1_arg.Pos = i;
+						result_libro = descargar_1(&descargar_1_arg, clnt);
+						if(result_libro == (TLibro *)NULL){
+						printf("ERROR. No se han obtenido los detalles del libro %d\n", i + 1);
+						}else{
+							bool_t cierto = FiltrarLibros(result_libro, opcBuscar, text, 1);
+							if(cierto==TRUE) {
+								j++;
+								MostrarLibro(result_libro, i, FALSE);
+							} 
 							
-							char opcBuscar2;
-							printf("¿Quieres sacar algun libro de la biblioteca?(s/n) ");
-							scanf(" %c",&opcBuscar2);
-							
-							if(opcBuscar2 != 's'){
-							
-							}else{
-							
-							printf("Introduce la posicion del libro a realizar la devolucion: ");
-							scanf("%d",&opc3);
-							devolver_1_arg.Pos = opc3-1;
-							
-							result_int = devolver_1(&devolver_1_arg, clnt);
-							if (result_int == (int *) NULL) {
-								clnt_perror (clnt, "call failed");
-							}else if(*result_int == -1){
-								printf("ERROR. La biblioteca no se ha inicializado");
-							}else if(*result_int == -2){
-								printf("ERROR. No se puede prestar el libro");
-							}else if(*result_int == -3){
-								printf("ERROR. No se puede prestar el libro");
-							}else{
-								printf("**Se ha devuelto el libro y se pondra en la estanteria.**\n");
-							}
-							
-							}
-						}	
-			
-			
-			
+						}
+					
+					    }
+					    printf("Total libros: %d\n", j);	
+				
+				
+					char opcBuscar2;
+					printf("¿Quieres devolver algun libro de la biblioteca?(s/n) ");
+					scanf(" %c",&opcBuscar2);
+					
+					if(opcBuscar2 == 's'){
+						printf("Introduce la posicion del libro a realizar la devolucion: ");
+						scanf("%d",&opc3);
+						devolver_1_arg.Pos = opc3-1;
+						
+						result_int = devolver_1(&devolver_1_arg, clnt);
+						if (result_int == (int *) NULL) {
+							clnt_perror (clnt, "call failed");
+						}else if(*result_int == -1) { 
+							printf("ERROR. Posicion no encontrada");
+						}if(*result_int == -2){
+							printf("ERROR. La biblioteca no se ha inicializado");
+						}else if(*result_int == 2){
+							printf("ERROR. No hay libros prestados.");
+						}else if(*result_int == 0) {
+							printf("**Se ha devuelto el libro y se ha reducido la lista de espera.**\n");
+						}else {
+							printf("**Se ha devuelto el libro y se pondra en la estanteria.**\n");
+						}
+					}
+				}
+			}
+		
+					
+			Pause;			
 			break;
-
-	
-	}
-		result_int = desconexion_1(&desconexion_1_arg, clnt);
-		if (result_int == (bool_t *) NULL) {
-			clnt_perror (clnt, "call failed");
-		}else {
-		printf("***DESCONEXION CON EXITO***\n");
-		registrado = false;
+		case 0:
+			result_int = desconexion_1(&desconexion_1_arg, clnt);
+			if (result_int == (bool_t *) NULL) {
+				clnt_perror (clnt, "call failed");
+			}else {
+			printf("***DESCONEXION CON EXITO***\n");
+			registrado = false;
+			}
+			//Pause;
+			break;
 		}
-	
-	Pause;
-	}while(opc1 != 0);
+
+	} while(opc1 != 0);
 
 	
 	

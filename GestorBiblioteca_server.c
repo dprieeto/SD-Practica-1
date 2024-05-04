@@ -306,7 +306,7 @@ devolver_1_svc(TPosicion *argp, struct svc_req *rqstp)
 	}else{
 		TLibro *libro = &Biblioteca[pos];
 		if(libro->NoPrestados == 0){
-			perror("ERROR. No hay libros prestados, por tanto no puedes devolverlo");
+			//perror("ERROR. No hay libros prestados, por tanto no puedes devolverlo");
 			result = 2; // no hay libros prestados.
 		}else if(libro->NoListaEspera > 0){
 			libro->NoListaEspera -= 1;
