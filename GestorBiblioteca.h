@@ -65,8 +65,8 @@ typedef struct TOrdenacion TOrdenacion;
 
 #if defined(__STDC__) || defined(__cplusplus)
 #define Conexion 1
-extern  int * conexion_1(int *, CLIENT *);
-extern  int * conexion_1_svc(int *, struct svc_req *);
+extern  int * conexion_1(char *, CLIENT *);
+extern  int * conexion_1_svc(char *, struct svc_req *);
 #define Desconexion 2
 extern  bool_t * desconexion_1(int *, CLIENT *);
 extern  bool_t * desconexion_1_svc(int *, struct svc_req *);

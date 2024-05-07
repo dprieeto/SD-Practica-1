@@ -26,11 +26,11 @@ int campoOrd = 0;
 
 
 int *
-conexion_1_svc(int *argp, struct svc_req *rqstp)
+conexion_1_svc(char *argp, struct svc_req *rqstp)
 {
 	static int  result;
-	int pass = *argp;
-	if(pass != 1234){
+	char pass = *argp;
+	if(strcmp(argp, "p") != 0){
 		result = -2;
 	}else if(idAdmin != -1){
 		result = -1;
@@ -59,7 +59,6 @@ desconexion_1_svc(int *argp, struct svc_req *rqstp)
 int *
 cargardatos_1_svc(TConsulta *argp, struct svc_req *rqstp)
 {
-	//printf("Ejecucion cargar datos servidor");
 	static int  result;
 	
 	if(idAdmin != argp-> Ida){
@@ -101,26 +100,15 @@ guardardatos_1_svc(int *argp, struct svc_req *rqstp)
 	if(idAdmin != *argp){
 		result = -1;
 	}else{
-		FILE *archivo = fopen(nameFich, "w+b");
-		
-		/*
-		if (access(argp->Datos, F_OK) == 0) {
-		    // el archivo existe se abre en modo de escritura
-		    archivo = fopen(argp->Datos, "wb");
-		} else {
-		    // el archivo no existe se crea en modo de escritura
-		    archivo = fopen(argp->Datos, "wb+");
-		}*/		
+		FILE *archivo = fopen(nameFich, "w+b");	
 	
 		if(archivo != NULL){
-			// escribir el numero de libros en el fichero:
 			valor = fwrite(&numLibros, sizeof(numLibros), 1, archivo);
 			
 			if(valor!=1) {
 				perror("\nError al escribir el numero de libros.");
 				result = -2;				
 			} else {
-				//guardar los datos de los libros:
 				
 				//Biblioteca = (TLibro *) malloc(sizeof(TLibro)*numLibros); //necesario?
 				
@@ -182,8 +170,9 @@ comprar_1_svc(TComRet *argp, struct svc_req *rqstp)
 
 	if(encontrado){
 	Biblioteca[i].NoLibros += argp->NoLibros;
-		result = Biblioteca[i].NoLibros;
+		result = 1;
 	}else{
+	result = 0;
 	perror("El libro no se ha encontrado");
 	}
 
@@ -205,8 +194,9 @@ retirar_1_svc(TComRet *argp, struct svc_req *rqstp)
 
 	if(encontrado){
 	Biblioteca[i].NoLibros -= argp->NoLibros;
-		result = Biblioteca[i].NoLibros;
+		result = 1;
 	}else{
+	result = 0;
 	perror("El libro no se ha encontrado");
 	}
 
@@ -214,10 +204,10 @@ retirar_1_svc(TComRet *argp, struct svc_req *rqstp)
 }
 
 int comparar_libros(const void *a, const void *b, int campo) {
-    struct TLibro *libroA = (const struct TLibro *)a;
-    struct TLibro *libroB = (const struct TLibro *)b;
+    struct TLibro *libroA = (struct TLibro *)a;
+    struct TLibro *libroB = (struct TLibro *)b;
 
-    switch (campo) {// compara por:
+    switch (campo) {
         case 0: // isbn
             return strcmp(libroA->Isbn, libroB->Isbn);
         case 1: // titulo
@@ -236,9 +226,6 @@ int comparar_libros(const void *a, const void *b, int campo) {
             return libroA->NoPrestados - libroB->NoPrestados;
         case 8: // libros reservados
             return libroA->NoListaEspera - libroB->NoListaEspera;
-        
-        default:
-            return 0; // si el campo no es valido no hace nada
     }
 }
 
@@ -247,18 +234,15 @@ void merge(int izq, int m, int dcha, int campo) {
 	int n1 = m - izq + 1;
 	int n2 = dcha - m;
 
-	// creacion de dos arrays temporales
 	struct TLibro *L = (struct TLibro*)malloc(n1 * sizeof(struct TLibro));
 	struct TLibro *R = (struct TLibro*)malloc(n2 * sizeof(struct TLibro));
 
 
-	// copia el contenido de Biblioteca en L y R
 	for (i = 0; i < n1; i++)
 		L[i] = Biblioteca[izq + i];
 	for (j = 0; j < n2; j++)
 		R[j] = Biblioteca[m + 1 + j];
 
-	// mezclar los arrays L y R en Biblioteca
 	i = 0;
 	j = 0;
 	k = izq;
@@ -273,14 +257,12 @@ void merge(int izq, int m, int dcha, int campo) {
 	k++;
 	}
 
-	// Copiar los elementos restantes de L[], si los hay
 	while (i < n1) {
 	Biblioteca[k] = L[i];
 	i++;
 	k++;
 	}
 
-	// Copiar los elementos restantes de R[], si los hay
 	while (j < n2) {
 	Biblioteca[k] = R[j];
 	j++;
@@ -296,11 +278,9 @@ void mergeSort(int izq, int dcha, int campo) {
     if (izq < dcha) {
         int m = izq + (dcha - izq) / 2;
 
-        // Ordenar la primera y segunda mitad
         mergeSort(izq, m, campo);
         mergeSort(m + 1, dcha, campo);
 
-        // Mezclar las mitades ordenadas
         merge(izq, m, dcha, campo);
     }
 }
@@ -312,9 +292,6 @@ ordenar_1_svc(TOrdenacion *argp, struct svc_req *rqstp)
 {
 	static bool_t  result;
 
-	/*
-	 * insert server code here
-	 */
 	if(Biblioteca == NULL || argp->Ida != idAdmin) {
 		result = FALSE;
 	} else {
@@ -344,6 +321,7 @@ buscar_1_svc(TConsulta *argp, struct svc_req *rqstp)
 	/*
 	 * insert server code here
 	 */
+	 //El buscar esta implementado en el cliente sin necesidad de usar este metodo.
 
 	return &result;
 }
@@ -353,11 +331,6 @@ descargar_1_svc(TPosicion *argp, struct svc_req *rqstp)
 {
 	static TLibro  result;
 
-	/*if(argp->Pos < 0 || argp->Pos >= numLibros){
-	perror("ERROR. La posicion no esta permitida\n");
-	return NULL;
-	}
-*/
 	result = Biblioteca[argp->Pos];
 
 	return &result;
@@ -378,13 +351,12 @@ prestar_1_svc(TPosicion *argp, struct svc_req *rqstp)
 	}else{
 		TLibro *libro = &Biblioteca[pos];
 		if(libro->NoLibros == 0){
-			//perror("ERROR. No hay suficientes libros disponibles");
 			libro->NoListaEspera += 1;
 			result = 0; // usuario en lista de espera
 		}else if(libro->NoLibros > 0){
 		libro->NoPrestados+=1;
 		result = 1; // libro prestado
-		libro->NoLibros -=1; // restar un disponible?
+		libro->NoLibros -=1;
 		}
 	}
 	
@@ -407,19 +379,15 @@ devolver_1_svc(TPosicion *argp, struct svc_req *rqstp)
 	}else{
 		TLibro *libro = &Biblioteca[pos];
 		if(libro->NoPrestados == 0){
-			//perror("ERROR. No hay libros prestados, por tanto no puedes devolverlo");
 			result = 2; // no hay libros prestados.
 		}else if(libro->NoListaEspera > 0){
 			libro->NoListaEspera -= 1;
 			result = 0; // se ha reducido la lista de espera
 		} else {
-			libro->NoPrestados-=1; // se quita un libro prestado
-			libro->NoLibros+=1;//se añade un libro mas disponible
+			libro->NoPrestados-=1; 
+			libro->NoLibros+=1;
 			result = 1; // el libro se ha devuelto y hay un libro disponible mas
 		}
 	}
 	return &result;
 }
-
-
-

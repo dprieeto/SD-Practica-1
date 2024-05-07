@@ -10,7 +10,7 @@
 static struct timeval TIMEOUT = { 25, 0 };
 
 int *
-conexion_1(int *argp, CLIENT *clnt)
+conexion_1(char *argp, CLIENT *clnt)
 {
 	static int clnt_res;
 

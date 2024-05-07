@@ -24,32 +24,6 @@ void MostrarAviso(const char* texto);
 bool_t FiltrarLibros(TLibro *L, char tipo, char *cadena, int nLibros);
 
 
-void
-gestorbiblioteca_1(char *host)
-{	
-	
- 	CLIENT *clnt;
-	bool_t  *result_8;
-	
-
-#ifndef	DEBUG
-
-	clnt = clnt_create (host, GESTORBIBLIOTECA, GESTORBIBLIOTECA_VER, "udp");
-	if (clnt == NULL) {
-		clnt_pcreateerror (host);
-		exit (1);
-	}
-#endif	/* DEBUG */
-
-
-		
-/*	
-	
-*/
-}
-
-
-
 int MenuPrincipal()
 {
 	 int Salida;
@@ -160,8 +134,6 @@ bool_t FiltrarLibros(TLibro *L, char tipo, char *cadena, int nLibros){
 	int nLibrosFiltrados = 0;
         
         bool_t b;
-	//for(int i = 0; i < nLibros; i++)
-	//{
 		b=FALSE;
 		switch(tipo){
 
@@ -197,11 +169,7 @@ bool_t FiltrarLibros(TLibro *L, char tipo, char *cadena, int nLibros){
 				}
 				break;
 
-		}/*
-		if (b==TRUE)
-			MostrarLibro(L, i, FALSE);
-	}
-	*/
+		}
 	return b;
 
 }
@@ -213,7 +181,7 @@ int main (int argc, char *argv[])
 	TConsulta  cargardatos_1_arg;
 	TConsulta guardardatos_1_arg;
 	TConsulta  buscar_1_arg;
-	int  conexion_1_arg;
+	char  conexion_1_arg;
 	int  nlibros_1_arg;
 	int  desconexion_1_arg;
 	TPosicion  descargar_1_arg;
@@ -229,7 +197,7 @@ int main (int argc, char *argv[])
 	int *numLibros;
 	char user[50];
 	char text[50];
-	int pass = 0;
+	char pass[50];
 	int opc1 = 1;
 	int opc2 = 0;
 	int opc3 = 10;
@@ -266,9 +234,9 @@ int main (int argc, char *argv[])
 				printf("\t***REGISTRAR ADMINISTRADOR***\n");
 				printf("Introduce el nombre del admin(admin): ");
 				scanf("%s",user);
-				printf("Introduce el password del admin(1234): ");
-				scanf("%d",&pass);
-				conexion_1_arg = pass;
+				printf("Introduce el password del admin(p): ");
+				scanf("%s",pass);
+				conexion_1_arg = pass[0];
 				result_int = conexion_1(&conexion_1_arg, clnt);
 				
 				//printf("El valor del resultado es %d.\n", *result_int);
@@ -321,7 +289,6 @@ int main (int argc, char *argv[])
 						guardardatos_1_arg;
 						printf("\t***GUARDAR DATOS BIBLIOTECA***\n");
 						
-						// llama a la funcion para guardar los datos en el fichero:
 						result_int = guardardatos_1(&idAdmin, clnt);
 						
 						if(*result_int == 0) {
@@ -369,8 +336,8 @@ int main (int argc, char *argv[])
 									if (result_int == (int *) NULL) {
 										clnt_perror (clnt, "call failed");
 									}else if(*result_int == 1){
-										printf("El libro se ha registrado correctamente");
-									}else printf("El libro no se ha creado");
+										printf("El libro se ha registrado correctamente\n");
+									}else printf("El libro no se ha creado\n");
 									
 						break;	
 					case 4:
@@ -417,7 +384,11 @@ int main (int argc, char *argv[])
 										result_int = comprar_1(&comprar_1_arg, clnt);
 										if (result_int == (int *) NULL) {
 											clnt_perror (clnt, "call failed");
-										}else{
+										}else if(*result_int == -1){
+											printf("**Ya hay un usuario identificado como administrador**");
+										}else if(*result_int == 0){
+											printf("**No hay un libro en el vector dinámico que tiene el mismo Isbn**");
+										}else if(*result_int == 1){
 											printf("**Se han añadido los nuevos libros**");
 										}
 									}
@@ -470,7 +441,11 @@ int main (int argc, char *argv[])
 										result_int = retirar_1(&retirar_1_arg, clnt);
 										if (result_int == (int *) NULL) {
 											clnt_perror (clnt, "call failed");
-										}else if(result_int == 1){
+										}else if(*result_int == -1){
+											printf("**Ya hay un usuario identificado como administrador**");
+										}else if(*result_int == 0){
+											printf("**No hay un libro en el vector dinámico que tiene el mismo Isbn.**");
+										}else if(*result_int == 1){
 											printf("**Se han retirado los libros**");
 										}
 									}
@@ -855,5 +830,3 @@ clnt_destroy (clnt);
 
 	exit (0);
 }
-
-
