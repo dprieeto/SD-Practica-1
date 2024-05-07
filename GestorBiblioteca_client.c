@@ -30,7 +30,7 @@ gestorbiblioteca_1(char *host)
 	
  	CLIENT *clnt;
 	bool_t  *result_8;
-	TOrdenacion  ordenar_1_arg;
+	
 
 #ifndef	DEBUG
 
@@ -44,10 +44,7 @@ gestorbiblioteca_1(char *host)
 
 		
 /*	
-	result_8 = ordenar_1(&ordenar_1_arg, clnt);
-	if (result_8 == (bool_t *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
+	
 */
 }
 
@@ -225,6 +222,7 @@ int main (int argc, char *argv[])
 	TComRet  retirar_1_arg;
 	TPosicion  prestar_1_arg;
 	TPosicion  devolver_1_arg;
+	TOrdenacion  ordenar_1_arg;
 	
 	bool_t  *result_bool;
 	int  *result_int;
@@ -438,24 +436,49 @@ int main (int argc, char *argv[])
 						Cls;
 						printf("\t***RETIRAR LIBROS***\n");
 						printf("\tIntroduce el Isbn a buscar: ");
-						scanf("%s", retirar_1_arg.Isbn);	
-						
+						scanf("%s", retirar_1_arg.Isbn);
 						char respuesta2;	
-						//MostrarLibro(comprar_1_arg->Libro, i, FALSE);	
-						printf("\t¿Es este el libro que deseas comprar mas unidades? (s/n)");
-						scanf("%c", &respuesta);
-						
-						
-						comprar_1_arg.Ida = idAdmin;
-						printf("Introduce Numero de Libros comprados: ");
-						scanf("%d",&retirar_1_arg.NoLibros);
-						
 						result_int = retirar_1(&retirar_1_arg, clnt);
-							if (result_int == (int *) NULL) {
-								clnt_perror (clnt, "call failed");
-							}else{
-								printf("**Se han añadido los nuevos libros**");
+						if(result_int == (int *) NULL){
+							clnt_perror(clnt, "call failed" );
+						}else{
+							int totalLibros = *result_int;
+							
+							if(totalLibros == 0) {
+								printf("No hay libros cargados");
+							} else {
+								while(i<totalLibros && !encontrado) {
+									descargar_1_arg.Pos = i;
+									libro = descargar_1(&descargar_1_arg, clnt);
+									
+									if(strcmp(libro->Isbn, retirar_1_arg.Isbn) == 0) {
+										pos = i;
+										encontrado = true;
+										
+									}
+									i++;
+								}
+								if(encontrado) {
+									MostrarLibro(libro, pos, TRUE);
+									printf("\t¿Es este el libro que deseas retirar unidades? (s/n)");
+									scanf(" %c", &respuesta2);
+									if(respuesta2=='s') {
+										retirar_1_arg.Ida = idAdmin;
+										printf("Introduce Numero de Libros a retirar: ");
+										scanf("%d",&retirar_1_arg.NoLibros);
+										
+										result_int = retirar_1(&retirar_1_arg, clnt);
+										if (result_int == (int *) NULL) {
+											clnt_perror (clnt, "call failed");
+										}else if(result_int == 1){
+											printf("**Se han retirado los libros**");
+										}
+									}
+								} else {
+									printf("No se ha encontrado ese libro.");
+								}	
 							}
+						}
 						break;
 					case 6:
 						Cls;
@@ -474,11 +497,25 @@ int main (int argc, char *argv[])
 						printf("6.- Por nº libros Disponibles\n");
 						printf("7.- Por nº libros Prestados\n");
 						printf("8.- Por nº libros en espera\n");
+						
+						
 					
 						printf("Introduce Codigo: ");
 						scanf("%d",&opc3);						
+						ordenar_1_arg.Ida = idAdmin;
+						ordenar_1_arg.Campo = opc3;
 						
+						result_bool = ordenar_1(&ordenar_1_arg, clnt);
+						if (result_bool == (bool_t *) NULL) {
+							clnt_perror (clnt, "call failed");
+						} else if(result_bool == FALSE) {
+							printf("Error con el id Administrador o la Biblioteca no esta inicializada.");
+						} else {
+							printf("Ordenador");	
+							
+						}
 						
+						Pause;
 						
 						break;	
 					case 7:
