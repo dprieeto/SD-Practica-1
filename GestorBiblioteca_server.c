@@ -29,8 +29,8 @@ int *
 conexion_1_svc(char *argp, struct svc_req *rqstp)
 {
 	static int  result;
-	char pass = *argp;
-	if(strcmp(argp, "p") != 0){
+//	char pass = *argp;
+	if(strcmp(argp, "1234") != 0){
 		result = -2;
 	}else if(idAdmin != -1){
 		result = -1;

@@ -195,9 +195,9 @@ int main (int argc, char *argv[])
 	bool_t  *result_bool;
 	int  *result_int;
 	int *numLibros;
-	char user[50];
-	char text[50];
-	char pass[50];
+	Cadena user;
+	Cadena text;
+	Cadena pass;
 	int opc1 = 1;
 	int opc2 = 0;
 	int opc3 = 10;
@@ -234,10 +234,10 @@ int main (int argc, char *argv[])
 				printf("\t***REGISTRAR ADMINISTRADOR***\n");
 				printf("Introduce el nombre del admin(admin): ");
 				scanf("%s",user);
-				printf("Introduce el password del admin(p): ");
+				printf("Introduce el password del admin(1234): ");
 				scanf("%s",pass);
-				conexion_1_arg = pass[0];
-				result_int = conexion_1(&conexion_1_arg, clnt);
+				//conexion_1_arg = pass[0];
+				result_int = conexion_1(pass, clnt);
 				
 				//printf("El valor del resultado es %d.\n", *result_int);
 				if (result_int == (int *)NULL)
