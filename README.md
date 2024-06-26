@@ -1,2 +1,2 @@
 # Sistemas Distribuidos
-Practica Cliente-Servidor meidante rpc/sun de la gestion de los prestamos y devoluciones de una biblioteca
+Practica Cliente-Servidor mediante rpc/sun de la gestion de libros de una bilioteca.
